@@ -39,7 +39,8 @@
 
 #include <nuttx/config.h>
 #include <stdio.h>
-#include <unistd.h>
+#include <string.h>
+#include <fcntl.h>
 
 /****************************************************************************
  * Definitions
@@ -73,7 +74,7 @@ void usage(void)
 #ifdef CONFIG_BUILD_KERNEL
 int main(int argc, FAR char *argv[])
 #else
-int crypto_main(int argc, char *argv[])
+int cryptool_main(int argc, char *argv[])
 #endif
 {
   int fd;
