@@ -1,0 +1,22 @@
+#
+# For a description of the syntax of this configuration file,
+# see misc/tools/kconfig-language.txt.
+#
+
+config EXAMPLES_CRYPTO
+	bool "Cryptographic API tool"
+	default n
+	---help---
+		Enable the Crypto tool
+
+if EXAMPLES_CRYPTO
+
+config EXAMPLES_CRYPTO_PROGNAME
+	string "Program name"
+	default "cryptool"
+	depends on BUILD_KERNEL
+	---help---
+		This is the name of the program that will be use when the NSH ELF
+		program is installed.
+
+endif
