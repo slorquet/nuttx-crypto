@@ -11,16 +11,16 @@ config CRYPTO
 
 if CRYPTO
 
-config CRYPTO_AES
-  bool "AES cypher support"
+config CRYPTO_CONTEXT_STATIC
+  bool "Enable Statically allocated session"
   default n
 
-config CRYPTO_ALGTEST
-  bool "Perform automatic crypto algorithms test on startup"
-  default n
+config CRYPTO_CONTEXT_STATIC_KEYS
+  int "Number of keys usable in the static context"
+  default 2
 
-config CRYPTO_CRYPTODEV
-  bool "cryptodev support"
-  default n
+config CRYPTO_CONTEXT_DYNAMIC_LIMIT
+  int "Limit the max number of dynamic contexts (0 for no limit)"
+  default 0
 
 endif
