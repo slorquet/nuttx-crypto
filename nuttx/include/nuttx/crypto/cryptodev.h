@@ -46,50 +46,33 @@
  * Pre-Processor Definitions
  ****************************************************************************/
 
-#define RIJNDAEL128_BLOCK_LEN   16
-#define AES_BLOCK_LEN           RIJNDAEL128_BLOCK_LEN
-
-#define CRYPTO_ALGORITHM_MIN    1
-#define CRYPTO_AES_ECB          1
-#define CRYPTO_AES_CBC          2
-#define CRYPTO_AES_CTR          3
-#define CRYPTO_ALGORITHM_MAX    1
-
-#define CRYPTO_FLAG_HARDWARE    0x01000000 /* hardware accelerated */
-#define CRYPTO_FLAG_SOFTWARE    0x02000000 /* software implementation */
-
-#define COP_ENCRYPT             1
-#define COP_DECRYPT             2
-#define COP_F_BATCH             0x0008 /* Batch op if possible */
-
-#define CIOCGSESSION            101
-#define CIOCFSESSION            102
-#define CIOCCRYPT               103
-
-typedef char* caddr_t;
-
-struct session_op
-{
-  uint32_t cipher;    /* ie. CRYPTO_AES_EBC */
-  uint32_t mac;
-
-  uint32_t keylen;    /* cipher key */
-  caddr_t key;
-  int mackeylen;      /* mac key */
-  caddr_t mackey;
-
-  uint32_t ses;       /* returns: session # */
-};
-
-struct crypt_op
-{
-  uint32_t ses;
-  uint16_t op;        /* i.e. COP_ENCRYPT */
-  uint16_t flags;
-  unsigned len;
-  caddr_t src, dst;   /* become iov[] inside kernel */
-  caddr_t mac;        /* must be big enough for chosen MAC */
-  caddr_t iv;
+enum {
+	CIOCRYPTO_MODULE_COUNT = 201,
+	CIOCRYPTO_MODULE_INFO,
+	CIOCRYPTO_CONTEXT_OPEN,
+	CIOCRYPTO_CONTEXT_CLOSE,
+	CIOCRYPTO_CONTEXT_INFO,
+	CIOCRYPTO_ALG_INFO,
+	CIOCRYPTO_ALG_SETPARAM,
+	CIOCRYPTO_KEY_FIND,
+	CIOCRYPTO_KEY_INFO,
+	CIOCRYPTO_KEY_CREATE,
+	CIOCRYPTO_KEY_DELETE,
+	CIOCRYPTO_KEY_SETVALUE,
+	CIOCRYPTO_KEY_TRANSFER,
+	CIOCRYPTO_CIPHER_INIT,
+	CIOCRYPTO_CIPHER_UPDATE,
+	CIOCRYPTO_CIPHER_FINAL,
+	CIOCRYPTO_DS_INIT,
+	CIOCRYPTO_DS_UPDATE,
+	CIOCRYPTO_DS_FINAL,
+	CIOCRYPTO_HASH_INIT,
+	CIOCRYPTO_HASH_UPDATE,
+	CIOCRYPTO_HASH_FINAL,
+	CIOCRYPTO_DERIVE,
+	CIOCRYPTO_WRAP,
+	CIOCRYPTO_UNWRAP,
+	CIOCRYPTO_GEN_RANDOM,
 };
 
 #endif /* __INCLUDE_NUTTX_CRYPTO_CRYPTODEV_H */

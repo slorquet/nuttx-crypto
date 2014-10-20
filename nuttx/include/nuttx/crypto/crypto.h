@@ -2,7 +2,7 @@
  * include/nuttx/crypto/crypto.h
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
- *   Author:  Max Nekludov <macscomp@gmail.com>
+ *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -47,24 +47,71 @@
  * Pre-Processor Definitions
  ****************************************************************************/
 
-#if defined(CONFIG_CRYPTO_AES)
-#  define AES_MODE_MIN 1
+#define CRYPTO_MODULE_FLAG_NEEDPIN    0x00000001
+#define CRYPTO_MODULE_FLAG_ISHW       0x00000002
 
-#  define AES_MODE_ECB 1
-#  define AES_MODE_CBC 2
-#  define AES_MODE_CTR 3
+#define CRYPTO_CONTEXT_FLAG_READONLY 0x00000001
+#define CRYPTO_CONTEXT_FLAG_ADMIN    0x00000002
 
-#  define AES_MODE_MAX 3
-#endif
+#define CRYPTO_ALG_PARAM_IV         0x00000001
 
-#define CYPHER_ENCRYPT 1
-#define CYPHER_DECRYPT 0
+#define CRYPTO_KEY_FIND_NAME         1
+#define CRYPTO_KEY_FIND_INDEX        2
+
+#define CRYPTO_KEY_FLAG_TOKEN        0x00000001
+#define CRYPTO_KEY_FLAG_ENCIPHER     0x00000002
+#define CRYPTO_KEY_FLAG_DECIPHER     0x00000004
+#define CRYPTO_KEY_FLAG_SIGN         0x00000008
+#define CRYPTO_KEY_FLAG_VERIFY       0x00000010
+#define CRYPTO_KEY_FLAG_DERIVE       0x00000020
+#define CRYPTO_KEY_FLAG_WRAP         0x00000040
+#define CRYPTO_KEY_FLAG_UNWRAP       0x00000080
+#define CRYPTO_KEY_FLAG_EXTRACT      0x00000100
+
+#define CRYPTO_KEY_COMPONENT_MAIN    0
+#define CRYPTO_KEY_COMPONENT_MOD     1
+#define CRYPTO_KEY_COMPONENT_EXP     2
+
+#define CRYPTO_CIPHER_FLAG_ENCIPHER  0x00000001
+#define CRYPTO_CIPHER_FLAG_DECIPHER  0x00000002
+#define CRYPTO_DS_FLAG_SIGN          0x00000001
+#define CRYPTO_DS_FLAG_VERIFY        0x00000002
+
+/****************************************************************************
+ * Types
+ ****************************************************************************/
+
+ #ifndef __ASSEMBLY__
+
+struct crypto_token_info {
+    char     name[16];
+    uint32_t flags;
+    uint32_t nkeys_used;
+    uint32_t nkeys_free;
+    uint32_t nmechs;
+};
+
+struct crypto_context_info {
+    uint32_t module_id;
+    uint32_t flags;
+    uint32_t nkeys_used;
+    uint32_t nkeys_free;
+};
+
+struct crypto_alg_info {
+    uint32_t alg_id;
+    uint32_t required_params;
+};
+
+struct crypto_key_info {
+    char     name[16];
+    uint32_t flags;
+    uint32_t key_length;
+};
 
 /************************************************************************************
  * Public Data
  ************************************************************************************/
-
-#ifndef __ASSEMBLY__
 
 #undef EXTERN
 #if defined(__cplusplus)
@@ -79,11 +126,42 @@ extern "C"
  * Public Function Prototypes
  ************************************************************************************/
 
-#if defined(CONFIG_CRYPTO_AES)
-int up_aesinitialize(void);
-int aes_cypher(FAR void *out, FAR const void *in, uint32_t size, FAR const void *iv,
-               FAR const void *key, uint32_t keysize, int mode, int encrypt);
-#endif
+int crypto_module_count(void);
+int crypto_module_info(int token_id, struct crypto_token_info *info);
+
+int crypto_context_open(int token_id, uint32_t flags, char *pin);
+int crypto_context_close(int context_id);
+int crypto_context_info(int context_id, struct crypto_context_info *sess);
+
+int crypto_alg_info(int token, int mech, struct crypto_mech_info *info);
+const char *crypto_alg_name(int mech_id);
+int crypto_alg_setparam(int context_id, uint32_t param, int len, uint8_t *value);
+
+int crypto_key_find(int context_id, uint32_t flags, int index, const char *label);
+int crypto_key_info(int context_id, int key_id, struct crypto_key_info *info);
+int crypto_key_create(int context_id, uint32_t flags, const char *label);
+int crypto_key_delete(int context_id, int key_id);
+int crypto_key_setvalue(int context_id, int key_id, int component, int length, uint8_t *value);
+int crypto_key_transfer(int context_id, int key_id, const char *label);
+
+int crypto_cipher_init(int context_id, int key_id, uint32_t flags);
+int crypto_cipher_update(int context_id, int len, uint8_t* in, uint8_t *out);
+int crypto_cipher_final(int context_id, int inlen, uint8_t *in, int* outlen, uint8_t *out);
+
+int crypto_ds_init(int context_id, int mech_id, int key_id, uint32_t flags);
+int crypto_ds_update(int context_id, int len, uint8_t* data);
+int crypto_ds_final(int context_id, int *siglen, uint8_t *sig);
+
+int crypto_hash_init(int context_id, int mech_id);
+int crypto_hash_update(int context_id, int len, uint8_t* data);
+int crypto_hash_final(int context_id, int* hashlen, uint8_t* hash);
+
+int crypto_derive(int context_id, int mech_id, int orig_key_id, int deriv_data_len, uint8_t* deriv_data, uint32_t new_key_flags);
+
+int crypto_wrap(int context_id, int mech_id, int key_id, int wrap_key_id, int *wrapped_len, uint8_t* wrapped);
+int crypto_unwrap(int context_id, int mech_id, int wrapped_len, uint8_t* wrapped_data, int wrap_key_id, uint32_t new_key_flags);
+
+int crypto_random_generate(int context_id, int len, uint8_t *data);
 
 #undef EXTERN
 #if defined(__cplusplus)
