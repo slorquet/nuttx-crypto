@@ -959,6 +959,8 @@ nuttx
  |   |   `- README.txt
  |   |- eagle100/
  |   |   `- README.txt
+ |   |- efm32-g8xx-stk/
+ |   |   `- README.txt
  |   |- ekk-lm3s9b96/
  |   |   `- README.txt
  |   |- ez80f910200kitg/
@@ -1020,6 +1022,8 @@ nuttx
  |   |- nucleus2g/
  |   |   `- README.txt
  |   |- nutiny-nuc120/
+ |   |   `- README.txt
+ |   |- olimex-efm32g880f129-stk/
  |   |   `- README.txt
  |   |- olimex-lpc1766stk/
  |   |   `- README.txt
