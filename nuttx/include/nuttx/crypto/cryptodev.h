@@ -75,4 +75,201 @@ enum {
 	CIOCRYPTO_GEN_RANDOM,
 };
 
+struct cryptodev_module_info {
+    //Request section
+    int      module_index;
+    //Response section
+    char     label[16];
+    uint32_t flags;
+    int      nkeys_used;
+    int      nkeys_free;
+    int      nalgs;
+};
+
+struct cryptodev_context_open {
+    // Request section
+    int      module_index;
+    char     pin[8];
+    int      pinlen;
+    uint32_t flags;
+    //Response section
+    int      context_id;
+};
+
+struct cryptodev_context_info {
+    // Request section
+    int      context_id;
+    //Response section
+    int      module_id;
+    uint32_t flags;
+    int      nkeys_used;
+    int      nkeys_free;
+};
+
+struct cryptodev_alg_info {
+    // Request section
+    int      module_id;
+    int      alg_index;
+    //Response section
+    uint32_t alg_id;
+    uint32_t required_params;
+};
+
+struct cryptodev_alg_param {
+    //Request section
+    uint32_t param_id;
+    int      param_value_size;
+    uint8_t* param_value;
+};
+
+struct cryptodev_key_find {
+    //Request section
+    int      context_id;
+    uint32_t flags;
+    char     label[16];
+    int      index;
+    //Response section
+    int      key_id;
+};
+
+struct cryptodev_key_info {
+    //Request section
+    int      context_id;
+    int      key_id;
+    //Response section
+    char     label[16];
+    uint32_t flags;
+    int      key_length;
+};
+
+struct cryptodev_key_create {
+    //Request section
+    int      context_id;
+    uint32_t flags;      //same as key info flags
+    char     label[16];
+    //Response section
+    int      key_id;
+};
+
+struct cryptodev_key_delete {
+    //Request section
+    int context_id;
+    int key_id;
+};
+
+struct cryptodev_key_setvalue {
+    //Request section
+    int      context_id;
+    int      key_id;
+    int      component_id;
+    int      component_length;
+    uint8_t* component;
+};
+
+struct cryptodev_key_transfer {
+    //Request section
+    int  context_id;
+    int  key_id;
+    char destination_key_label[16];
+};
+
+struct cryptodev_cipher_init {
+    //Request section
+    int      context_id;
+    int      key_id;
+    uint32_t flags;
+};
+
+struct cryptodev_cipher_update {
+    //Request section
+    int      context_id;
+    int      data_length; //same for input and output
+    uint8_t* indata;
+    //Response section
+    uint8_t* outdata;
+};
+
+struct cryptodev_cipher_final {
+    //Request section
+    int      context_id;
+    int      indata_length;
+    uint8_t* indata;
+    //Mixed section
+    int*     outdata_length;
+    //Response section
+    uint8_t* outdata;
+};
+
+struct cryptodev_ds_init {
+    //Request section
+    int      context_id;
+    int      algorithm_id;
+    int      key_id;
+    uint32_t flags;
+};
+
+struct cryptodev_data_update {
+    //Request section
+    int      context_id;
+    int      data_length;
+    uint8_t* data;
+};
+
+struct cryptodev_ds_final {
+    //Request section
+    int      context_id;
+    //Mixed section
+    int*     sig_length;
+    uint8_t* signature;
+};
+
+struct cryptodev_hash_init {
+    //Request section
+    int    context_id;
+    int    algorithm_id;
+};
+
+struct cryptodev_derive {
+    //Request section
+    int      context_id;
+    int      algorithm_id;
+    int      original_key_id;
+    int      derivation_data_len;
+    uint8_t* derivation_data;
+    uint32_t new_key_flags;
+    //Response section
+    int      new_key_id;
+};
+
+struct cryptodev_wrap {
+    //Request section
+    int      context_id;
+    int      algorithm_id;
+    int      key_id;
+    int      wrap_key_id;
+    //Response section
+    int*     wrapped_length;
+    uint8_t* wrapped;
+};
+
+struct cryptodev_unwrap {
+    //Request section
+    int      context_id;
+    int      algorithm_id;
+    int*     wrapped_length;
+    uint8_t* wrapped;
+    int      wrap_key_id;
+    uint32_t new_key_flags;
+    //Response section
+    int      new_key_id;
+};
+
+struct cryptodev_random {
+    //Mixed section
+    int*     data_length;
+    //Response section
+    uint8_t* randomdata;
+};
+
+
 #endif /* __INCLUDE_NUTTX_CRYPTO_CRYPTODEV_H */
