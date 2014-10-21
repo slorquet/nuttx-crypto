@@ -83,7 +83,7 @@
 
  #ifndef __ASSEMBLY__
 
-struct crypto_token_info_s {
+struct crypto_module_info_s {
     char     name[16];
     uint32_t flags;
     uint32_t nkeys_used;
@@ -131,7 +131,7 @@ int crypto_init_fd(int fd);
 int crypto_close(void);
 
 int crypto_module_count(void);
-int crypto_module_info(int token_id, struct crypto_token_info_s *info);
+int crypto_module_info(int token_id, struct crypto_module_info_s *info);
 
 int crypto_context_open(int token_id, uint32_t flags, char *pin);
 int crypto_context_close(int context_id);

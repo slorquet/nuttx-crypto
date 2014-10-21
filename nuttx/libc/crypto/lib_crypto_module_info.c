@@ -62,7 +62,8 @@
  *
  **************************************************************************/
 
-int crypto_module_info(int token_id, struct crypto_token_info_s *info)
+int crypto_module_info(int token_id, struct crypto_module_info_s *info)
 {
+  sprintf(info->name,"Undef_%04d",token_id);
   return 0;
 }

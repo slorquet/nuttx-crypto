@@ -58,17 +58,33 @@
 void usage(void)
 {
   printf(
-    "tool for crypto API\n"
+    "Example Tool for crypto API\n"
     "cryptool <CMD> [args]\n"
     "  modlist       list available modules\n"
     "  keylist <id>  list all keys in a modules\n"
     "\n"
-    "report bugs to nuttx@yahoogroups.com and sebastien@lorquet.fr\n"
+    "Report bugs to nuttx@yahoogroups.com and sebastien@lorquet.fr\n"
   );
 }
 
 void modules_list(void)
 {
+  struct crypto_module_info_s info;
+  int i,err;
+  int count = crypto_module_count();
+  printf("Number of available modules: %d\n",count);
+  for(i=0;i<count;i++)
+  {
+    err=crypto_module_info(i,&info);
+    if(!err)
+    {
+      printf("%2d [%16s]\n",i,info.name);
+    }
+    else
+    {
+      printf("%2d Cannot get info, err=%d\n",i,err);
+    }
+  }
 }
  
 /****************************************************************************
