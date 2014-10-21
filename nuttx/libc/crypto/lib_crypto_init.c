@@ -39,6 +39,7 @@
 
 #include <nuttx/config.h>
 
+#include <fcntl.h>
 #include <nuttx/crypto/cryptodev.h>
 #include <nuttx/crypto/crypto.h>
 
