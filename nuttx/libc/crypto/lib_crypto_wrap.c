@@ -1,5 +1,5 @@
 /****************************************************************************
- * libc/crypto/lib_crypto_wap.c
+ * libc/crypto/lib_crypto_wrap.c
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
@@ -39,8 +39,8 @@
 
 #include <nuttx/config.h>
 
-#include <nuttx/cryptodev.h>
-#include <nuttx/crypto.h>
+#include <nuttx/crypto/cryptodev.h>
+#include <nuttx/crypto/crypto.h>
 
 /****************************************************************************
  * Pre-processor Definitions

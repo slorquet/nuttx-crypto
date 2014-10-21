@@ -39,8 +39,8 @@
 
 #include <nuttx/config.h>
 
-#include <nuttx/cryptodev.h>
-#include <nuttx/crypto.h>
+#include <nuttx/crypto/cryptodev.h>
+#include <nuttx/crypto/crypto.h>
 
 /****************************************************************************
  * Pre-processor Definitions
@@ -62,7 +62,7 @@
  *
  **************************************************************************/
 
-int crypto_context_info(int context_id, struct crypto_context_info *sess)
+int crypto_context_info(int context_id, struct crypto_context_info_s *sess)
 {
   return 0;
 }

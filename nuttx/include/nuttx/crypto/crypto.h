@@ -83,7 +83,7 @@
 
  #ifndef __ASSEMBLY__
 
-struct crypto_token_info {
+struct crypto_token_info_s {
     char     name[16];
     uint32_t flags;
     uint32_t nkeys_used;
@@ -91,19 +91,19 @@ struct crypto_token_info {
     uint32_t nmechs;
 };
 
-struct crypto_context_info {
+struct crypto_context_info_s {
     uint32_t module_id;
     uint32_t flags;
     uint32_t nkeys_used;
     uint32_t nkeys_free;
 };
 
-struct crypto_alg_info {
+struct crypto_alg_info_s {
     uint32_t alg_id;
     uint32_t required_params;
 };
 
-struct crypto_key_info {
+struct crypto_key_info_s {
     char     name[16];
     uint32_t flags;
     uint32_t key_length;
@@ -127,18 +127,18 @@ extern "C"
  ************************************************************************************/
 
 int crypto_module_count(void);
-int crypto_module_info(int token_id, struct crypto_token_info *info);
+int crypto_module_info(int token_id, struct crypto_token_info_s *info);
 
 int crypto_context_open(int token_id, uint32_t flags, char *pin);
 int crypto_context_close(int context_id);
-int crypto_context_info(int context_id, struct crypto_context_info *sess);
+int crypto_context_info(int context_id, struct crypto_context_info_s *sess);
 
-int crypto_alg_info(int token, int mech, struct crypto_mech_info *info);
+int crypto_alg_info(int token, int mech, struct crypto_alg_info_s *info);
 const char *crypto_alg_name(int mech_id);
 int crypto_alg_setparam(int context_id, uint32_t param, int len, uint8_t *value);
 
 int crypto_key_find(int context_id, uint32_t flags, int index, const char *label);
-int crypto_key_info(int context_id, int key_id, struct crypto_key_info *info);
+int crypto_key_info(int context_id, int key_id, struct crypto_key_info_s *info);
 int crypto_key_create(int context_id, uint32_t flags, const char *label);
 int crypto_key_delete(int context_id, int key_id);
 int crypto_key_setvalue(int context_id, int key_id, int component, int length, uint8_t *value);

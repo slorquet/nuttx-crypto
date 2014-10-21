@@ -39,14 +39,14 @@
 
 #include <nuttx/config.h>
 
-#include <nuttx/cryptodev.h>
-#include <nuttx/crypto.h>
+#include <nuttx/crypto/cryptodev.h>
+#include <nuttx/crypto/crypto.h>
 
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/
 
-static const char g_unimplemented = "Unimplemented";
+static const char * g_unimplemented = "Unimplemented";
 
 /****************************************************************************
  * Private Functions

@@ -39,8 +39,8 @@
 
 #include <nuttx/config.h>
 
-#include <nuttx/cryptodev.h>
-#include <nuttx/crypto.h>
+#include <nuttx/crypto/cryptodev.h>
+#include <nuttx/crypto/crypto.h>
 
 /****************************************************************************
  * Pre-processor Definitions
@@ -62,7 +62,7 @@
  *
  **************************************************************************/
 
-int crypto_alg_info(int token, int mech, struct crypto_mech_info *info)
+int crypto_alg_info(int token, int mech, struct crypto_alg_info_s *info)
 {
   return 0;
 }

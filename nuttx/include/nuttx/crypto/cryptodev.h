@@ -41,6 +41,7 @@
  ****************************************************************************/
 
 #include <nuttx/config.h>
+#include <stdint.h>
 
 /****************************************************************************
  * Pre-Processor Definitions
@@ -75,7 +76,7 @@ enum {
 	CIOCRYPTO_GEN_RANDOM,
 };
 
-struct cryptodev_module_info {
+struct cryptodev_module_info_s {
     //Request section
     int      module_index;
     //Response section
@@ -86,7 +87,7 @@ struct cryptodev_module_info {
     int      nalgs;
 };
 
-struct cryptodev_context_open {
+struct cryptodev_context_open_s {
     // Request section
     int      module_index;
     char     pin[8];
@@ -96,7 +97,7 @@ struct cryptodev_context_open {
     int      context_id;
 };
 
-struct cryptodev_context_info {
+struct cryptodev_context_info_s {
     // Request section
     int      context_id;
     //Response section
@@ -106,7 +107,7 @@ struct cryptodev_context_info {
     int      nkeys_free;
 };
 
-struct cryptodev_alg_info {
+struct cryptodev_alg_info_s {
     // Request section
     int      module_id;
     int      alg_index;
@@ -115,14 +116,14 @@ struct cryptodev_alg_info {
     uint32_t required_params;
 };
 
-struct cryptodev_alg_param {
+struct cryptodev_alg_param_s {
     //Request section
     uint32_t param_id;
     int      param_value_size;
     uint8_t* param_value;
 };
 
-struct cryptodev_key_find {
+struct cryptodev_key_find_s {
     //Request section
     int      context_id;
     uint32_t flags;
@@ -132,7 +133,7 @@ struct cryptodev_key_find {
     int      key_id;
 };
 
-struct cryptodev_key_info {
+struct cryptodev_key_info_s {
     //Request section
     int      context_id;
     int      key_id;
@@ -142,7 +143,7 @@ struct cryptodev_key_info {
     int      key_length;
 };
 
-struct cryptodev_key_create {
+struct cryptodev_key_create_s {
     //Request section
     int      context_id;
     uint32_t flags;      //same as key info flags
@@ -151,13 +152,13 @@ struct cryptodev_key_create {
     int      key_id;
 };
 
-struct cryptodev_key_delete {
+struct cryptodev_key_delete_s {
     //Request section
     int context_id;
     int key_id;
 };
 
-struct cryptodev_key_setvalue {
+struct cryptodev_key_setvalue_s {
     //Request section
     int      context_id;
     int      key_id;
@@ -166,21 +167,21 @@ struct cryptodev_key_setvalue {
     uint8_t* component;
 };
 
-struct cryptodev_key_transfer {
+struct cryptodev_key_transfer_s {
     //Request section
     int  context_id;
     int  key_id;
     char destination_key_label[16];
 };
 
-struct cryptodev_cipher_init {
+struct cryptodev_cipher_init_s {
     //Request section
     int      context_id;
     int      key_id;
     uint32_t flags;
 };
 
-struct cryptodev_cipher_update {
+struct cryptodev_cipher_update_s {
     //Request section
     int      context_id;
     int      data_length; //same for input and output
@@ -189,7 +190,7 @@ struct cryptodev_cipher_update {
     uint8_t* outdata;
 };
 
-struct cryptodev_cipher_final {
+struct cryptodev_cipher_final_s {
     //Request section
     int      context_id;
     int      indata_length;
@@ -200,7 +201,7 @@ struct cryptodev_cipher_final {
     uint8_t* outdata;
 };
 
-struct cryptodev_ds_init {
+struct cryptodev_ds_init_s {
     //Request section
     int      context_id;
     int      algorithm_id;
@@ -208,14 +209,14 @@ struct cryptodev_ds_init {
     uint32_t flags;
 };
 
-struct cryptodev_data_update {
+struct cryptodev_data_update_s {
     //Request section
     int      context_id;
     int      data_length;
     uint8_t* data;
 };
 
-struct cryptodev_ds_final {
+struct cryptodev_data_final_s {
     //Request section
     int      context_id;
     //Mixed section
@@ -223,13 +224,13 @@ struct cryptodev_ds_final {
     uint8_t* signature;
 };
 
-struct cryptodev_hash_init {
+struct cryptodev_hash_init_s {
     //Request section
     int    context_id;
     int    algorithm_id;
 };
 
-struct cryptodev_derive {
+struct cryptodev_derive_s {
     //Request section
     int      context_id;
     int      algorithm_id;
@@ -241,7 +242,7 @@ struct cryptodev_derive {
     int      new_key_id;
 };
 
-struct cryptodev_wrap {
+struct cryptodev_wrap_s {
     //Request section
     int      context_id;
     int      algorithm_id;
@@ -252,7 +253,7 @@ struct cryptodev_wrap {
     uint8_t* wrapped;
 };
 
-struct cryptodev_unwrap {
+struct cryptodev_unwrap_s {
     //Request section
     int      context_id;
     int      algorithm_id;
@@ -264,7 +265,7 @@ struct cryptodev_unwrap {
     int      new_key_id;
 };
 
-struct cryptodev_random {
+struct cryptodev_random_s {
     //Mixed section
     int*     data_length;
     //Response section
