@@ -35,35 +35,49 @@
 
 # Add the crypto API files to the build
 
+CSRCS += lib_crypto_init.c
+CSRCS += lib_crypto_init_fd.c
+CSRCS += lib_crypto_close.c
+
 CSRCS += lib_crypto_cipher_final.c
 CSRCS += lib_crypto_cipher_init.c
 CSRCS += lib_crypto_cipher_update.c
+
 CSRCS += lib_crypto_derive.c
+
 CSRCS += lib_crypto_ds_final.c
 CSRCS += lib_crypto_ds_init.c
 CSRCS += lib_crypto_ds_update.c
+
 CSRCS += lib_crypto_hash_final.c
 CSRCS += lib_crypto_hash_init.c
 CSRCS += lib_crypto_hash_update.c
+
 CSRCS += lib_crypto_key_create.c
 CSRCS += lib_crypto_key_delete.c
 CSRCS += lib_crypto_key_find.c
 CSRCS += lib_crypto_key_info.c
 CSRCS += lib_crypto_key_setvalue.c
 CSRCS += lib_crypto_key_transfer.c
+
 CSRCS += lib_crypto_alg_info.c
 CSRCS += lib_crypto_alg_name.c
 CSRCS += lib_crypto_alg_setparam.c
+
 CSRCS += lib_crypto_random_generate.c
+
 CSRCS += lib_crypto_context_close.c
 CSRCS += lib_crypto_context_info.c
 CSRCS += lib_crypto_context_open.c
+
 CSRCS += lib_crypto_module_count.c
 CSRCS += lib_crypto_module_info.c
+
 CSRCS += lib_crypto_unwrap.c
+
 CSRCS += lib_crypto_wrap.c
 
-# Add the stdlib directory to the build
+# Add the crypto directory to the build
 
 DEPPATH += --dep-path crypto
 VPATH += :crypto

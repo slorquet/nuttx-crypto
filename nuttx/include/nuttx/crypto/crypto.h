@@ -126,6 +126,10 @@ extern "C"
  * Public Function Prototypes
  ************************************************************************************/
 
+int crypto_init(void);
+int crypto_init_fd(int fd);
+int crypto_close(void);
+
 int crypto_module_count(void);
 int crypto_module_info(int token_id, struct crypto_token_info_s *info);
 
