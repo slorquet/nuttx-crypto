@@ -3,6 +3,7 @@
 #
 #   Copyright (C) 2007, 2008, 2011-2014 Gregory Nutt. All rights reserved.
 #   Author: Gregory Nutt <gnutt@nuttx.org>
+#   Author: Sebastien Lorquet <sebastien@lorquet.fr>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -38,15 +39,11 @@
 ifeq ($(CONFIG_CRYPTO),y)
 
 # Basic
+# cryptodev support is mandatory
+# TODO move testmngr.c into crypto application (or in specific app)
 
 CRYPTO_ASRCS  =
-CRYPTO_CSRCS  = crypto.c testmngr.c
-
-# cryptodev support
-
-ifeq ($(CONFIG_CRYPTO_CRYPTODEV),y)
-CRYPTO_CSRCS += cryptodev.c
-endif
+CRYPTO_CSRCS  = crypto.c cryptodev.c
 
 endif # CONFIG_CRYPTO
 

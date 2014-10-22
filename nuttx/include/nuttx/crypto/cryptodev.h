@@ -2,7 +2,7 @@
  * include/nuttx/crypto/cryptodev.h
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
- *   Author:  Max Nekludov <macscomp@gmail.com>
+ *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
