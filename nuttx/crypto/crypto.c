@@ -2,7 +2,7 @@
  * crypto/crypto.c
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
- *   Author:  Max Nekludov <macscomp@gmail.com>
+ *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -44,6 +44,7 @@
 #include <string.h>
 #include <poll.h>
 #include <errno.h>
+#include <debug.h>
 
 #include <nuttx/fs/fs.h>
 #include <nuttx/crypto/crypto.h>
@@ -64,23 +65,29 @@
  * Public Functions
  ****************************************************************************/
 
+ /****************************************************************************
+ * Name: crypto_init
+ *
+ * Description:
+ *   Initialize the cryptographic subsystem. Setup session management and prepare
+ *   for registration of device/board specific crypto modules.
+ *
+ **************************************************************************/
+
 void up_cryptoinitialize(void)
 {
   int res = OK;
 
-#if defined(CONFIG_CRYPTO_AES)
-  res = up_aesinitialize();
-  if (res)
-    return res;
+  cryptdbg("Starting crypto core initialization\n");
+  //Initialize an empty list of crypto modules
+  //This list will be populated when board specific code calls cryptocore_module_register
+  
+#ifdef CONFIG_CRYPTO_CONTEXT_STATIC
+  //Setup variables in static session
+  //Number of keys is CRYPTO_CONTEXT_STATIC_KEYS
 #endif
-
-#if defined(CONFIG_CRYPTO_ALGTEST)
-  res = crypto_test();
-  if (res)
-    cryptlldbg("crypto test failed\n");
-  else
-    cryptllvdbg("crypto test OK\n");
-#endif
+  
+  //Initialize list of dynamic sessions
 
   return res;
 }

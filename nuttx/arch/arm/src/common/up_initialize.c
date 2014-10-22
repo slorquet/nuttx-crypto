@@ -195,11 +195,8 @@ void up_initialize(void)
 #endif
 
 #if defined(CONFIG_CRYPTO)
-  up_cryptoinitialize();
-#endif
-
-#if defined(CONFIG_CRYPTO_CRYPTODEV)
-  devcrypto_register(); /* /dev/crypto */
+  up_cryptoinitialize(); /* Initialize the cryptographic core */
+  devcrypto_register(); /* Create /dev/crypto and register IOCTL entry points */
 #endif
 
 #if defined(CONFIG_DEV_ZERO)
