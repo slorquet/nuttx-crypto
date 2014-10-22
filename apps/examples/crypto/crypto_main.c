@@ -118,6 +118,7 @@ int cryptool_main(int argc, char *argv[])
   if(!strcmp(argv[1], "modlist"))
   {
     //enumerate tokens
+    modules_list();
   }
   else if(!strcmp(argv[1], "keylist"))
   {

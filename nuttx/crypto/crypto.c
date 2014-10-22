@@ -74,7 +74,7 @@
  *
  **************************************************************************/
 
-void up_cryptoinitialize(void)
+int up_cryptoinitialize(void)
 {
   int res = OK;
 

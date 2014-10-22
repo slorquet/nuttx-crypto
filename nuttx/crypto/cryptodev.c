@@ -46,6 +46,7 @@
 #include <poll.h>
 #include <errno.h>
 #include <debug.h>
+#include <stdio.h>
 
 #include <nuttx/fs/fs.h>
 
@@ -77,7 +78,9 @@ static const struct file_operations g_cryptodevops =
   cryptodev_write,    /* write */
   0,                  /* seek */
   cryptodev_ioctl,    /* ioctl */
+#ifndef CONFIG_DISABLE_POLL
   0,                  /* poll */
+#endif
 };
 
 /****************************************************************************
@@ -101,9 +104,27 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
   switch(cmd)
   {
   case CIOCRYPTO_MODULE_COUNT:
-    return 0;
+    {
+      int *dest = (int*)arg;
+      *dest = 3;
+      return 0;
+    }
 	
   case CIOCRYPTO_MODULE_INFO:
+    {
+      struct cryptodev_module_info_s *info = (struct cryptodev_module_info_s*)arg;
+      if(info->module_index>2)
+      {
+        return -ENODEV;
+      }
+      sprintf(info->name,"Module_%04d",info->module_index);
+      info->flags = 0;
+      info->nkeys_used = 0;
+      info->nkeys_free = 1;
+      info->nalgs = 1;
+      return 0;
+    }
+
   case CIOCRYPTO_CONTEXT_OPEN:
   case CIOCRYPTO_CONTEXT_CLOSE:
   case CIOCRYPTO_CONTEXT_INFO:
@@ -128,7 +149,7 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
   case CIOCRYPTO_WRAP:
   case CIOCRYPTO_UNWRAP:
   case CIOCRYPTO_GEN_RANDOM:
-    return -EACCESS;
+    return -EACCES;
 	
   default:
     return -EINVAL;

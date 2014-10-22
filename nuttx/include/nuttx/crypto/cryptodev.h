@@ -80,7 +80,7 @@ struct cryptodev_module_info_s {
     //Request section
     int      module_index;
     //Response section
-    char     label[16];
+    char     name[16];
     uint32_t flags;
     int      nkeys_used;
     int      nkeys_free;
@@ -127,7 +127,7 @@ struct cryptodev_key_find_s {
     //Request section
     int      context_id;
     uint32_t flags;
-    char     label[16];
+    char     name[16];
     int      index;
     //Response section
     int      key_id;

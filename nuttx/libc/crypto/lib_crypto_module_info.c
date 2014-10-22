@@ -46,6 +46,8 @@
  * Pre-processor Definitions
  ****************************************************************************/
 
+extern int g_crypto_fd;
+
 /****************************************************************************
  * Private Functions
  ****************************************************************************/
@@ -58,12 +60,23 @@
  * Name: crypto_module_info
  *
  * Description:
- *   todo
+ *   Given its index, retrieve live information about a crypto module.
  *
  **************************************************************************/
 
-int crypto_module_info(int token_id, struct crypto_module_info_s *info)
+int crypto_module_info(int module_id, struct crypto_module_info_s *info)
 {
-  sprintf(info->name,"Undef_%04d",token_id);
-  return 0;
+  struct cryptodev_module_info_s devinfo;
+  int err;
+  devinfo.module_index = module_id;
+  err = ioctl(g_crypto_fd, CIOCRYPTO_MODULE_INFO, (unsigned long)&devinfo);
+  if(!err)
+  {
+    //Okay, copy info
+    memcpy(info->name, devinfo.name, 16);
+    info->flags      = devinfo.flags;
+    info->nkeys_used = devinfo.nkeys_used;
+    info->nkeys_free = devinfo.nkeys_free;
+  }
+  return err;
 }

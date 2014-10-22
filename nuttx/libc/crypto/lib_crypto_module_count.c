@@ -39,12 +39,15 @@
 
 #include <nuttx/config.h>
 
+#include <sys/ioctl.h>
 #include <nuttx/crypto/cryptodev.h>
 #include <nuttx/crypto/crypto.h>
 
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/
+
+extern int g_crypto_fd;
 
 /****************************************************************************
  * Private Functions
@@ -64,5 +67,14 @@
 
 int crypto_module_count(void)
 {
-  return 0;
+  int modcount;
+  int ret = ioctl(g_crypto_fd, CIOCRYPTO_MODULE_COUNT, (unsigned long)&modcount);
+  if(!ret)
+  {
+    return modcount;
+  }
+  else
+  {
+    return -1;
+  }
 }

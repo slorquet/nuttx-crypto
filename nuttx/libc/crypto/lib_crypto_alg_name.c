@@ -46,6 +46,8 @@
  * Pre-processor Definitions
  ****************************************************************************/
 
+extern int g_crypto_fd;
+
 static const char * g_unimplemented = "Unimplemented";
 
 /****************************************************************************
