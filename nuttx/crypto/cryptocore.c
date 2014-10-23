@@ -66,13 +66,13 @@ struct cryptocore_module_t *modules_head;
  * Public Functions
  ****************************************************************************/
 
-struct cryptocore_module_s *module_find(char *name, uint32_t id)
+struct cryptocore_module_s *cryptocore_module_find(char *name, uint32_t id)
 {
   return NULL;
 }
 
  /****************************************************************************
- * Name: crypto_init
+ * Name: up_cryptoinitialize
  *
  * Description:
  *   Initialize the cryptographic subsystem. Setup session management and prepare
@@ -87,6 +87,7 @@ int up_cryptoinitialize(void)
   cryptdbg("Starting crypto core initialization\n");
   //Initialize an empty list of crypto modules
   //This list will be populated when board specific code calls cryptocore_module_register
+  modules_head = NULL;
   
 #ifdef CONFIG_CRYPTO_CONTEXT_STATIC
   //Setup variables in static session
