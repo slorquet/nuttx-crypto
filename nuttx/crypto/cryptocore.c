@@ -1,5 +1,5 @@
 /****************************************************************************
- * crypto/crypto.c
+ * crypto/cryptocore.c
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
@@ -47,7 +47,7 @@
 #include <debug.h>
 
 #include <nuttx/fs/fs.h>
-#include <nuttx/crypto/crypto.h>
+#include "cryptocore.h"
 
 /****************************************************************************
  * Private Function Prototypes
@@ -56,6 +56,7 @@
 /****************************************************************************
  * Private Data
  ****************************************************************************/
+struct cryptocore_module_t *modules_head;
 
 /****************************************************************************
  * Private Functions
@@ -64,6 +65,11 @@
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
+
+struct cryptocore_module_s *module_find(char *name, uint32_t id)
+{
+  return NULL;
+}
 
  /****************************************************************************
  * Name: crypto_init

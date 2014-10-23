@@ -78,7 +78,7 @@ void modules_list(void)
     err=crypto_module_info(i,&info);
     if(!err)
     {
-      printf("%2d [%16s]\n",i,info.name);
+      printf("%2d [%16s] %08X %d/%d\n",i,info.name,info.flags,info.nkeys_used,info.nkeys_free);
     }
     else
     {
