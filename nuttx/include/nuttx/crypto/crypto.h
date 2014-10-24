@@ -33,6 +33,8 @@
  *
  ****************************************************************************/
 
+/* user interface to the crypto api */
+
 #ifndef __INCLUDE_NUTTX_CRYPTO_CRYPTO_H
 #define __INCLUDE_NUTTX_CRYPTO_CRYPTO_H
 
@@ -46,13 +48,15 @@
  * Pre-Processor Definitions
  ****************************************************************************/
 
-#define CRYPTO_MODULE_FLAG_NEEDPIN    0x00000001
-#define CRYPTO_MODULE_FLAG_ISHW       0x00000002
+#define CRYPTO_MODULE_FLAG_NEEDPIN   0x00000001
+#define CRYPTO_MODULE_FLAG_ISHW      0x00000002
 
 #define CRYPTO_CONTEXT_FLAG_READONLY 0x00000001
 #define CRYPTO_CONTEXT_FLAG_ADMIN    0x00000002
 
-#define CRYPTO_ALG_PARAM_IV         0x00000001
+#define CRYPTO_ALG_PARAM_IV          0x00000001
+#define CRYPTO_ALG_PARAM_CRC_POLY    0x00000002
+#define CRYPTO_ALG_PARAM_CRC_INITVAL 0x00000004
 
 #define CRYPTO_KEY_FIND_NAME         1
 #define CRYPTO_KEY_FIND_INDEX        2

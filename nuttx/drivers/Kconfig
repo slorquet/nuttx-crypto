@@ -22,6 +22,16 @@ config DEV_ZERO
 config ARCH_HAVE_RNG
 	bool
 
+config CRYPTO_SOFTMODULE
+	bool "Enable software-only cryptographic module"
+	default n
+	depends on CRYPTO
+	---help---
+		Allows testing the crypto API core and run crypto algorithms
+		even if the target CPU does not have any cryptographic device.
+		WARNING This software module is NOT protected against any attack.
+		It is only a test/demonstration software.
+	
 config DEV_RANDOM
 	bool "Enable /dev/random"
 	default n

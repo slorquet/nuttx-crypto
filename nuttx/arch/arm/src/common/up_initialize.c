@@ -196,9 +196,12 @@ void up_initialize(void)
 
 #if defined(CONFIG_CRYPTO)
   up_cryptoinitialize(); /* Initialize the cryptographic core */
-  devcrypto_register(); /* Create /dev/crypto and register IOCTL entry points */
+  devcrypto_register(); /* Create /dev/crypto */
 #endif
-
+#if defined(CONFIG_CRYPTO_SOFTMODULE)
+  
+#endif
+)
 #if defined(CONFIG_DEV_ZERO)
   devzero_register();   /* Standard /dev/zero */
 #endif

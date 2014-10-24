@@ -33,7 +33,7 @@
  *
  ****************************************************************************/
 
-/*glue logic for all crypto framework*/
+/*Functions used by cryptographic module implementations*/
 
 /****************************************************************************
  * Included Files
@@ -41,81 +41,23 @@
 
 #include <nuttx/config.h>
 
-#include <sys/types.h>
-#include <stdbool.h>
-#include <string.h>
-#include <poll.h>
-#include <errno.h>
-#include <debug.h>
-
-#include <nuttx/fs/fs.h>
-#include "cryptocore.h"
-
-/****************************************************************************
- * Private Function Prototypes
- ****************************************************************************/
-
-/****************************************************************************
- * Private Data
- ****************************************************************************/
-struct cryptocore_module_t *modules_head;
-
-/****************************************************************************
- * Private Functions
- ****************************************************************************/
-
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
 
  /****************************************************************************
- * Name: cryptocore_module_find
+ * Name: cryptomod_register
  *
  * Description:
- *   Returns a crypto module structure given a module name.
- *   If the module is not found, returns NULL.
- *   TODO constant time search
+ *   Registers a new cryptographic module and make it available
+ *   to the cryptographic core. Basically we just add it to a linked list.
  *
  **************************************************************************/
 
-struct cryptocore_module_s *cryptocore_module_find(char *name, uint32_t id)
+int cryptomod_register(char *name, struct cryptomod_operations *ops)
 {
-  struct cryptocore_module_s *cur;
-  for(cur = modules_head; cur != NULL; cur = cur->next)
-  {
-    if(!strncmp(cur->name, name, 16))
-    {
-      return cur;
-    }
-  }
-  return NULL;
-}
-
- /****************************************************************************
- * Name: up_cryptoinitialize
- *
- * Description:
- *   Initialize the cryptographic subsystem. Setup session management and prepare
- *   for registration of device/board specific crypto modules.
- *
- **************************************************************************/
-
-int up_cryptoinitialize(void)
-{
-  int res = OK;
-
-  cryptdbg("Starting crypto core initialization\n");
-  //Initialize an empty list of crypto modules
-  //This list will be populated when board specific code calls cryptocore_module_register
-  modules_head = NULL;
-  
-#ifdef CONFIG_CRYPTO_CONTEXT_STATIC
-  //Setup variables in static session
-  //Number of keys is CRYPTO_CONTEXT_STATIC_KEYS
-#endif
-  
-  //Initialize list of dynamic sessions
-
-  return res;
+  /*alloc mem*/
+  /*link*/
+  /*populate*/
 }
 
