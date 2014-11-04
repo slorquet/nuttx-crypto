@@ -43,6 +43,22 @@
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/
+/* UART0
+ *
+ *   The control MCU acts as a board controller (BC). There is a UART
+ *   connection between the EFM and the BC. The connection is made by
+ *   setting the EFM_BC_EN (PD13) line high. The EFM can then use the BSP to
+ *   send commands to the BC. When EFM_BC_EN is low, EFM_BC_TX and EFM_BC_RX
+ *   can be used by other applications.
+ */
+
+#ifdef CONFIG_EFM32G8STK_BCEN
+#  define GPIO_BC_EN  (GPIO_OUTPUT_PUSHPULL|GPIO_OUTPUT_SET|\
+                       GPIO_PORTD|GPIO_PIN13)
+#else
+#  define GPIO_BC_EN  (GPIO_OUTPUT_PUSHPULL|GPIO_OUTPUT_CLEAR|\
+                       GPIO_PORTD|GPIO_PIN13)
+#endif
 
  /* LEDs
   *
@@ -62,13 +78,13 @@
   * value to the LED.
   */
 
-#define GPIO_LED1       (GPIO_OUTPUT_WIREDOR_PULLDOWN|\
+#define GPIO_LED0       (GPIO_OUTPUT_WIREDOR_PULLDOWN|\
                          GPIO_OUTPUT_CLEAR|GPIO_PORTC|GPIO_PIN0)
-#define GPIO_LED2       (GPIO_OUTPUT_WIREDOR_PULLDOWN|\
+#define GPIO_LED1       (GPIO_OUTPUT_WIREDOR_PULLDOWN|\
                          GPIO_OUTPUT_CLEAR|GPIO_PORTC|GPIO_PIN1)
-#define GPIO_LED3       (GPIO_OUTPUT_WIREDOR_PULLDOWN|\
+#define GPIO_LED2       (GPIO_OUTPUT_WIREDOR_PULLDOWN|\
                          GPIO_OUTPUT_CLEAR|GPIO_PORTC|GPIO_PIN2)
-#define GPIO_LED4       (GPIO_OUTPUT_WIREDOR_PULLDOWN|\
+#define GPIO_LED3       (GPIO_OUTPUT_WIREDOR_PULLDOWN|\
                          GPIO_OUTPUT_CLEAR|GPIO_PORTC|GPIO_PIN3)
 
 /****************************************************************************
@@ -83,4 +99,4 @@
 void board_led_initialize(void);
 #endif
 
-#endif /* __CONFIGS_EFM32_DK3650_INCLUDE_BOARD_H */
+#endif /* __CONFIGS_EFM32_G8XX_STK_SRC_EFM32_G8XX_STK_H */

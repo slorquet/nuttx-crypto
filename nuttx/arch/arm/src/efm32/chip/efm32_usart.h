@@ -1,6 +1,6 @@
 /********************************************************************************************************************************
  * arch/arm/src/efm32/EFM32GG/efm32_usart.h
- * 
+ *
  *    (C) Copyright 2014 Silicon Labs, http://www.silabs.com
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -65,7 +65,12 @@
  * Included Files
  *******************************************************************************************************************************/
 
+#include <nuttx/config.h>
 #include "chip/efm32_memorymap.h"
+
+#if !defined(CONFIG_EFM32_EFM32GG) && !defined(CONFIG_EFM32_EFM32G)
+#  warning This is the EFM32GG/G header file; Review/modification needed for this archtecture
+#endif
 
 /*******************************************************************************************************************************
  * Pre-processor Definitions

@@ -7,7 +7,7 @@ choice
 	prompt "Select target board"
 	default ARCH_BOARD_CUSTOM
 	---help---
-		Select the board hosting the architure.  You must first select the
+		Select the board hosting the architecture.  You must first select the
 		exact MCU part number, then the boards supporting that part will
 		be available for selection.  Use ARCH_BOARD_CUSTOM to create a new
 		board configuration.
@@ -132,7 +132,15 @@ config ARCH_BOARD_EFM32G8XXSTK
 	select ARCH_HAVE_LEDS
 	select ARCH_HAVE_BUTTONS
 	---help---
-		This options selects the EFM32 Gecko Starter Kit (EFM32-G8XX-STK).
+		This option selects the EFM32 Gecko Starter Kit (EFM32-G8XX-STK).
+
+config ARCH_BOARD_EFM32GG_STK3700
+	bool "EFM32 Giant Gecko Starter Kit"
+	depends on ARCH_CHIP_EFM32GG990F1024
+	select ARCH_HAVE_LEDS
+	select ARCH_HAVE_BUTTONS
+	---help---
+		This option selects the EFM32 Giant Gecko Starter Kit (EFM32GG-STK3700).
 
 config ARCH_BOARD_EKKLM3S9B96
 	bool "TI/Stellaris EKK-LM3S9B96"
@@ -961,6 +969,9 @@ config ARCH_BOARD_CUSTOM
 
 endchoice
 
+if ARCH_BOARD_CUSTOM
+menu "Custom Board Configuration"
+
 config ARCH_BOARD_CUSTOM_DIR
 	string "Custom board directory"
 	depends on ARCH_BOARD_CUSTOM
@@ -971,6 +982,34 @@ config ARCH_BOARD_CUSTOM_DIR
 		toplevel NuttX directory (like "configs/myboard") or an absolute path
 		to some location outside of the NuttX source tree (like
 		"~/projects/myboard").
+
+config BOARD_CUSTOM_LEDS
+	bool "Custom board LEDs"
+	default n
+	select ARCH_HAVE_LEDS
+	select ARCH_LEDS
+
+config BOARD_CUSTOM_BUTTONS
+	bool "Custom board buttons"
+	default n
+	select ARCH_HAVE_BUTTONS
+	select ARCH_BUTTONS
+
+config BOARD_CUSTOM_IRQBUTTONS
+	bool "Custom Board IRQ buttons"
+	default n
+	depends on BOARD_CUSTOM_BUTTONS
+	select ARCH_HAVE_IRQBUTTONS
+	select ARCH_IRQBUTTONS
+
+config BOARD_CUSTOM_INTERRUPT
+	bool "Custom board PHY interrupts"
+	default n
+	depends on NETDEVICES
+	select ARCH_PHY_INTERRUPT if NETDEVICES
+
+endmenu # Custom Board Configuration
+endif #ARCH_BOARD_CUSTOM
 
 config ARCH_BOARD
 	string
@@ -986,6 +1025,7 @@ config ARCH_BOARD
 	default "ea3152"                   if ARCH_BOARD_EA3152
 	default "eagle100"                 if ARCH_BOARD_EAGLE100
 	default "efm32-g8xx-stk"           if ARCH_BOARD_EFM32G8XXSTK
+	default "efm32gg-stk3700"          if ARCH_BOARD_EFM32GG_STK3700
 	default "ekk-lm3s9b96"             if ARCH_BOARD_EKKLM3S9B96
 	default "ez80f910200kitg"          if ARCH_BOARD_EZ80F910200KITG
 	default "ez80f910200zco"           if ARCH_BOARD_EZ80F910200ZCO
@@ -1160,6 +1200,9 @@ source "configs/eagle100/Kconfig"
 endif
 if ARCH_BOARD_EFM32G8XXSTK
 source "configs/efm32-g8xx-stk/Kconfig"
+endif
+if ARCH_BOARD_EFM32GG_STK3700
+source "configs/efm32gg-stk3700/Kconfig"
 endif
 if ARCH_BOARD_EKKLM3S9B96
 source "configs/ekk-lm3s9b96/Kconfig"
