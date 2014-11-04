@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_key_info(int context_id, int key_id, struct crypto_key_info_s *info)
+int crypto_key_info(int contextid, int keyid, FAR struct crypto_key_info_s *info)
 {
   return 0;
 }

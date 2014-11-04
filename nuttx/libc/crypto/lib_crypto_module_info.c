@@ -68,11 +68,11 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_module_info(int module_id, struct crypto_module_info_s *info)
+int crypto_module_info(int moduleid, FAR struct crypto_module_info_s *info)
 {
   struct cryptodev_module_info_s devinfo;
   int err;
-  devinfo.module_index = module_id;
+  devinfo.module_index = moduleid;
   err = ioctl(g_crypto_fd, CIOCRYPTO_MODULE_INFO, (unsigned long)&devinfo);
   if(!err)
   {

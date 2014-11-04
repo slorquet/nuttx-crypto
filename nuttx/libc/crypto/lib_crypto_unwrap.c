@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_unwrap(int context_id, int mech_id, int wrapped_len, uint8_t* wrapped_data, int wrap_key_id, uint32_t new_key_flags)
+int crypto_unwrap(int contextid, int mechid, int wrappedlen, FAR uint8_t *wrappeddata, int wrapkeyid, uint32_t newkeyflags)
 {
   return 0;
 }

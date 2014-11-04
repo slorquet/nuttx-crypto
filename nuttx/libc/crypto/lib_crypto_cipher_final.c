@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_cipher_final(int context_id, int inlen, uint8_t *in, int* outlen, uint8_t *out)
+int crypto_cipher_final(int contextid, int inlen, FAR uint8_t *in, FAR int *outlen, FAR uint8_t *out)
 {
   return 0;
 }

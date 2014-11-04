@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_hash_init(int context_id, int mech_id)
+int crypto_hash_init(int contextid, int mechid)
 {
   return 0;
 }

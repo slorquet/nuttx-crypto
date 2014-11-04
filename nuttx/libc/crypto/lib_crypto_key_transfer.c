@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_key_transfer(int context_id, int key_id, const char *name)
+int crypto_key_transfer(int contextid, int keyid, FAR const char *name)
 {
   return 0;
 }

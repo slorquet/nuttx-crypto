@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_context_open(int token_id, uint32_t flags, char *pin)
+int crypto_context_open(int tokenid, uint32_t flags, FAR const char *pin)
 {
   return 0;
 }

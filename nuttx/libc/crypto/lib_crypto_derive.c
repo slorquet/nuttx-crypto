@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_derive(int context_id, int mech_id, int orig_key_id, int deriv_data_len, uint8_t* deriv_data, uint32_t new_key_flags)
+int crypto_derive(int contextid, int mechid, int origkeyid, int derivdatalen, FAR uint8_t *derivdata, uint32_t newkeyflags)
 {
   return 0;
 }

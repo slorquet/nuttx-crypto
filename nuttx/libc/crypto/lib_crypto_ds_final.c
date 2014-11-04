@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_ds_final(int context_id, int *siglen, uint8_t *sig)
+int crypto_ds_final(int contextid, FAR int *siglen, FAR uint8_t *sig)
 {
   return 0;
 }

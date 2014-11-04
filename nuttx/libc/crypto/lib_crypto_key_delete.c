@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_key_delete(int context_id, int key_id)
+int crypto_key_delete(int contextid, int keyid)
 {
   return 0;
 }

@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_key_setvalue(int context_id, int key_id, int component, int length, uint8_t *value)
+int crypto_key_setvalue(int contextid, int keyid, int component, int length, FAR uint8_t *value)
 {
   return 0;
 }

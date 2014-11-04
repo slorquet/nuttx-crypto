@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_cipher_init(int context_id, int key_id, uint32_t flags)
+int crypto_cipher_init(int contextid, int keyid, uint32_t flags)
 {
   return 0;
 }

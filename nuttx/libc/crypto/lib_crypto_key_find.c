@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_key_find(int context_id, uint32_t flags, int index, const char *name)
+int crypto_key_find(int contextid, uint32_t flags, int index, FAR const char *name)
 {
   return 0;
 }

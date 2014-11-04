@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_ds_init(int context_id, int mech_id, int key_id, uint32_t flags)
+int crypto_ds_init(int contextid, int mechid, int keyid, uint32_t flags)
 {
   return 0;
 }

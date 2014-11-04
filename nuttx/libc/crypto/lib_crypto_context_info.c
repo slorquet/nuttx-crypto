@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_context_info(int context_id, struct crypto_context_info_s *sess)
+int crypto_context_info(int contextid, FAR struct crypto_context_info_s *sess)
 {
   return 0;
 }

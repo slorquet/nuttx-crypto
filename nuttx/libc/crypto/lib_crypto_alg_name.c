@@ -70,7 +70,7 @@ static const char * g_unimplemented = "Unimplemented";
  *
  **************************************************************************/
 
-const char *crypto_alg_name(int mech_id)
+const char *crypto_alg_name(int mechid)
 {
   return g_unimplemented;
 }

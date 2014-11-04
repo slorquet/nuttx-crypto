@@ -86,7 +86,8 @@
 
  #ifndef __ASSEMBLY__
 
-struct crypto_module_info_s {
+struct crypto_module_info_s
+{
     char     name[16];
     uint32_t flags;
     uint32_t nkeys_used;
@@ -94,19 +95,22 @@ struct crypto_module_info_s {
     uint32_t nmechs;
 };
 
-struct crypto_context_info_s {
+struct crypto_context_info_s
+{
     uint32_t module_id;
     uint32_t flags;
     uint32_t nkeys_used;
     uint32_t nkeys_free;
 };
 
-struct crypto_alg_info_s {
+struct crypto_alg_info_s
+{
     uint32_t alg_id;
     uint32_t required_params;
 };
 
-struct crypto_key_info_s {
+struct crypto_key_info_s
+{
     char     name[16];
     uint32_t flags;
     uint32_t key_length;
@@ -134,41 +138,41 @@ int crypto_init_fd(int fd);
 int crypto_close(void);
 
 int crypto_module_count(void);
-int crypto_module_info(int token_id, struct crypto_module_info_s *info);
+int crypto_module_info(int tokenid, FAR struct crypto_module_info_s *info);
 
-int crypto_context_open(int token_id, uint32_t flags, char *pin);
-int crypto_context_close(int context_id);
-int crypto_context_info(int context_id, struct crypto_context_info_s *sess);
+int crypto_context_open(int tokenid, uint32_t flags, FAR const char *pin);
+int crypto_context_close(int contextid);
+int crypto_context_info(int contextid, FAR struct crypto_contextinfo_s *sess);
 
-int crypto_alg_info(int token, int mech, struct crypto_alg_info_s *info);
-const char *crypto_alg_name(int mech_id);
-int crypto_alg_setparam(int context_id, uint32_t param, int len, uint8_t *value);
+int crypto_alg_info(int token, int mech, FAR struct crypto_alg_info_s *info);
+const char *crypto_alg_name(int mechid);
+int crypto_alg_setparam(int contextid, uint32_t param, int len, FAR uint8_t *value);
 
-int crypto_key_find(int context_id, uint32_t flags, int index, const char *label);
-int crypto_key_info(int context_id, int key_id, struct crypto_key_info_s *info);
-int crypto_key_create(int context_id, uint32_t flags, const char *label);
-int crypto_key_delete(int context_id, int key_id);
-int crypto_key_setvalue(int context_id, int key_id, int component, int length, uint8_t *value);
-int crypto_key_transfer(int context_id, int key_id, const char *label);
+int crypto_key_find(int contextid, uint32_t flags, int index, FAR const char *label);
+int crypto_key_info(int contextid, int keyid, FAR struct crypto_key_info_s *info);
+int crypto_key_create(int contextid, uint32_t flags, FAR const char *label);
+int crypto_key_delete(int contextid, int keyid);
+int crypto_key_setvalue(int contextid, int keyid, int component, int length, FAR uint8_t *value);
+int crypto_key_transfer(int contextid, int keyid, FAR const char *label);
 
-int crypto_cipher_init(int context_id, int key_id, uint32_t flags);
-int crypto_cipher_update(int context_id, int len, uint8_t* in, uint8_t *out);
-int crypto_cipher_final(int context_id, int inlen, uint8_t *in, int* outlen, uint8_t *out);
+int crypto_cipher_init(int contextid, int keyid, uint32_t flags);
+int crypto_cipher_update(int contextid, int len, FAR uint8_t *in, FAR uint8_t *out);
+int crypto_cipher_final(int contextid, int inlen, FAR uint8_t *in, FAR int *outlen, FAR uint8_t *out);
 
-int crypto_ds_init(int context_id, int mech_id, int key_id, uint32_t flags);
-int crypto_ds_update(int context_id, int len, uint8_t* data);
-int crypto_ds_final(int context_id, int *siglen, uint8_t *sig);
+int crypto_ds_init(int contextid, int mechid, int keyid, uint32_t flags);
+int crypto_ds_update(int contextid, int len, FAR uint8_t *data);
+int crypto_ds_final(int contextid, FAR int *siglen, FAR uint8_t *sig);
 
-int crypto_hash_init(int context_id, int mech_id);
-int crypto_hash_update(int context_id, int len, uint8_t* data);
-int crypto_hash_final(int context_id, int* hashlen, uint8_t* hash);
+int crypto_hash_init(int contextid, int mechid);
+int crypto_hash_update(int contextid, int len, FAR uint8_t *data);
+int crypto_hash_final(int contextid, FAR int *hashlen, FAR uint8_t *hash);
 
-int crypto_derive(int context_id, int mech_id, int orig_key_id, int deriv_data_len, uint8_t* deriv_data, uint32_t new_key_flags);
+int crypto_derive(int contextid, int mechid, int origkeyid, int derivdatalen, FAR uint8_t *derivdata, uint32_t newkeyflags);
 
-int crypto_wrap(int context_id, int mech_id, int key_id, int wrap_key_id, int *wrapped_len, uint8_t* wrapped);
-int crypto_unwrap(int context_id, int mech_id, int wrapped_len, uint8_t* wrapped_data, int wrap_key_id, uint32_t new_key_flags);
+int crypto_wrap(int contextid, int mechid, int keyid, int wrapkeyid, FAR int *wrappedlen, FAR uint8_t *wrapped);
+int crypto_unwrap(int contextid, int mechid, int wrappedlen, FAR uint8_t *wrappeddata, int wrapkeyid, uint32_t newkeyflags);
 
-int crypto_random_generate(int context_id, int len, uint8_t *data);
+int crypto_random_generate(int contextid, int len, FAR uint8_t *data);
 
 #undef EXTERN
 #if defined(__cplusplus)

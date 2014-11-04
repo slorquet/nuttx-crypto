@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_hash_final(int context_id, int* hashlen, uint8_t* hash)
+int crypto_hash_final(int contextid, FAR int *hashlen, FAR uint8_t *hash)
 {
   return 0;
 }

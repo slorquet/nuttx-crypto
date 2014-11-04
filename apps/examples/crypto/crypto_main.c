@@ -55,7 +55,7 @@
  * Public Functions
  ****************************************************************************/
 
-void usage(void)
+static void usage(void)
 {
   printf(
     "Example Tool for crypto API\n"
@@ -67,30 +67,30 @@ void usage(void)
   );
 }
 
-void modules_list(void)
+static void modules_list(void)
 {
   struct crypto_module_info_s info;
-  int i,err;
+  int i;
+  int err;
   int count = crypto_module_count();
   printf("Number of available modules: %d\n",count);
-  for(i=0;i<count;i++)
-  {
-    err=crypto_module_info(i,&info);
-    if(!err)
+  for (i=0;i<count;i++)
     {
-      printf("%2d [%16s] %08X %d/%d\n",i,info.name,info.flags,info.nkeys_used,info.nkeys_free);
+      err=crypto_module_info(i,&info);
+      if (!err)
+        {
+          printf("%2d [%16s] %08X %d/%d\n",i,info.name,info.flags,info.nkeys_used,info.nkeys_free);
+        }
+      else
+        {
+          printf("%2d ! Cannot get info, err=%d\n",i,err);
+        }
     }
-    else
-    {
-      printf("%2d Cannot get info, err=%d\n",i,err);
-    }
-  }
 }
- 
+
 /****************************************************************************
  * crypto_main
  ****************************************************************************/
-
 
 #ifdef CONFIG_BUILD_KERNEL
 int main(int argc, FAR char *argv[])
@@ -100,36 +100,40 @@ int cryptool_main(int argc, char *argv[])
 {
   int fd;
   
-  if(argc<2)
-  {
-    usage();
-    return 0;
-  }
+  if (argc<2)
+    {
+      usage();
+      return 0;
+    }
 
   fd = open("/dev/crypto", O_RDWR);
-  if(fd<0)
-  {
-    printf("cannot open /dev/crypto\n");
-    return 1;
-  }
+  if (fd<0)
+    {
+      printf("cannot open /dev/crypto\n");
+      return 1;
+    }
 
   crypto_init_fd(fd);
   
-  if(!strcmp(argv[1], "modlist"))
-  {
-    //enumerate tokens
-    modules_list();
-  }
-  else if(!strcmp(argv[1], "keylist"))
-  {
-    //enumerate keys in a module
-  }
+  if (!strcmp(argv[1], "modlist"))
+    {
+      /* enumerate tokens */
+      modules_list();
+    }
+  else if (!strcmp(argv[1], "keylist"))
+    {
+      /* enumerate keys in a module */
+      /* need an arg: module index */
+      if(argc!=3)
+    
+    }
   else
-  {
-    printf("unknown command '%s'\n", argv[1]);
-  }
+    {
+      printf("unknown command '%s'\n", argv[1]);
+    }
 
   crypto_close();
   
   return 0;
 }
+

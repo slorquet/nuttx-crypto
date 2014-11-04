@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_ds_update(int context_id, int len, uint8_t* data)
+int crypto_ds_update(int contextid, int len, FAR uint8_t *data)
 {
   return 0;
 }

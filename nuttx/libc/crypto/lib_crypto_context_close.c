@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_context_close(int context_id)
+int crypto_context_close(int contextid)
 {
   return 0;
 }

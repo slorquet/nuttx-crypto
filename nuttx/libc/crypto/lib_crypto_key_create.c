@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_key_create(int context_id, uint32_t flags, const char *name)
+int crypto_key_create(int contextid, uint32_t flags, FAR const char *name)
 {
   return 0;
 }

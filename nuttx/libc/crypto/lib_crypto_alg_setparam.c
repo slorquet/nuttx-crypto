@@ -68,7 +68,7 @@ extern int g_crypto_fd;
  *
  **************************************************************************/
 
-int crypto_alg_setparam(int context_id, uint32_t param, int len, uint8_t *value)
+int crypto_alg_setparam(int contextid, uint32_t param, int len, FAR uint8_t *value)
 {
   return 0;
 }
