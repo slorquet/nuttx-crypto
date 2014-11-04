@@ -1,5 +1,5 @@
 /****************************************************************************
- * libc/crypto/lib_crypto_random_generate.c
+ * crypto/cryptocore.c
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
@@ -33,24 +33,32 @@
  *
  ****************************************************************************/
 
+/*glue logic for all crypto framework*/
+
 /****************************************************************************
  * Included Files
  ****************************************************************************/
 
 #include <nuttx/config.h>
 
-#include <nuttx/crypto/cryptodev.h>
-#include <nuttx/crypto/crypto.h>
+#include <sys/types.h>
+#include <stdbool.h>
+#include <string.h>
+#include <poll.h>
+#include <errno.h>
+#include <debug.h>
+
+#include <nuttx/fs/fs.h>
+#include "cryptocore.h"
 
 /****************************************************************************
- * Pre-processor Definitions
+ * Private Function Prototypes
  ****************************************************************************/
 
 /****************************************************************************
  * Private Data
  ****************************************************************************/
-
-extern int g_crypto_fd;
+struct cryptocore_module_t *modules_head;
 
 /****************************************************************************
  * Private Functions
@@ -60,15 +68,54 @@ extern int g_crypto_fd;
  * Public Functions
  ****************************************************************************/
 
-/****************************************************************************
- * Name: crypto_random_generate
+ /****************************************************************************
+ * Name: cryptocore_module_find
  *
  * Description:
- *   todo
+ *   Returns a crypto module structure given a module name.
+ *   If the module is not found, returns NULL.
+ *   TODO constant time search
  *
  **************************************************************************/
 
-int crypto_random_generate(int context_id, int len, uint8_t *data)
+struct cryptocore_module_s *cryptocore_module_find(char *name, uint32_t id)
 {
-  return 0;
+  struct cryptocore_module_s *cur;
+  for(cur = modules_head; cur != NULL; cur = cur->next)
+  {
+    if(!strncmp(cur->name, name, 16))
+    {
+      return cur;
+    }
+  }
+  return NULL;
 }
+
+ /****************************************************************************
+ * Name: up_cryptoinitialize
+ *
+ * Description:
+ *   Initialize the cryptographic subsystem. Setup session management and prepare
+ *   for registration of device/board specific crypto modules.
+ *
+ **************************************************************************/
+
+int up_cryptoinitialize(void)
+{
+  int res = OK;
+
+  cryptdbg("Starting crypto core initialization\n");
+  //Initialize an empty list of crypto modules
+  //This list will be populated when board specific code calls cryptocore_module_register
+  modules_head = NULL;
+  
+#ifdef CONFIG_CRYPTO_CONTEXT_STATIC
+  //Setup variables in static session
+  //Number of keys is CRYPTO_CONTEXT_STATIC_KEYS
+#endif
+  
+  //Initialize list of dynamic sessions
+
+  return res;
+}
+

@@ -1,5 +1,5 @@
 /****************************************************************************
- * libc/crypto/lib_crypto_random_generate.c
+ * libc/crypto/lib_crypto_close.c
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
@@ -39,6 +39,7 @@
 
 #include <nuttx/config.h>
 
+#include <unistd.h>
 #include <nuttx/crypto/cryptodev.h>
 #include <nuttx/crypto/crypto.h>
 
@@ -61,14 +62,16 @@ extern int g_crypto_fd;
  ****************************************************************************/
 
 /****************************************************************************
- * Name: crypto_random_generate
+ * Name: crypto_close
  *
  * Description:
  *   todo
  *
  **************************************************************************/
 
-int crypto_random_generate(int context_id, int len, uint8_t *data)
+int crypto_close(void)
 {
+  close(g_crypto_fd);
   return 0;
 }
+

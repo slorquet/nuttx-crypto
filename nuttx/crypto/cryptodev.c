@@ -3,6 +3,7 @@
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author:  Max Nekludov <macscomp@gmail.com>
+ *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -40,10 +41,10 @@
 #include <nuttx/config.h>
 
 #include <sys/types.h>
-#include <stdbool.h>
-#include <string.h>
 #include <poll.h>
 #include <errno.h>
+#include <debug.h>
+#include <stdio.h>
 
 #include <nuttx/fs/fs.h>
 
@@ -75,7 +76,9 @@ static const struct file_operations g_cryptodevops =
   cryptodev_write,    /* write */
   0,                  /* seek */
   cryptodev_ioctl,    /* ioctl */
+#ifndef CONFIG_DISABLE_POLL
   0,                  /* poll */
+#endif
 };
 
 /****************************************************************************
@@ -98,61 +101,54 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
 {
   switch(cmd)
   {
-  case CIOCGSESSION:
+  case CIOCRYPTO_MODULE_COUNT:
     {
-      struct session_op *ses = (struct session_op*)arg;
-      ses->ses = (uint32_t)ses;
-      return OK;
+      int *dest = (int*)arg;
+      *dest = 3;
+      return 0;
     }
-
-  case CIOCFSESSION:
+	
+  case CIOCRYPTO_MODULE_INFO:
     {
-      return OK;
-    }
-
-  case CIOCCRYPT:
-    {
-      FAR struct crypt_op *op = (struct crypt_op*)arg;
-      FAR struct session_op *ses = (struct session_op*)op->ses;
-      int encrypt;
-
-      switch (op->op)
+      struct cryptodev_module_info_s *info = (struct cryptodev_module_info_s*)arg;
+      if(info->module_index>2)
       {
-      case COP_ENCRYPT:
-        encrypt = 1;
-        break;
-
-      case COP_DECRYPT:
-        encrypt = 0;
-        break;
-
-      default:
-        return -EINVAL;
+        return -ENODEV;
       }
-
-      switch (ses->cipher)
-      {
-
-#if defined(CONFIG_CRYPTO_AES)
-#  define AES_CYPHER(mode) aes_cypher(op->dst, op->src, op->len, op->iv, ses->key, ses->keylen, mode, encrypt)
-
-      case CRYPTO_AES_ECB:
-        return AES_CYPHER(AES_MODE_ECB);
-
-      case CRYPTO_AES_CBC:
-        return AES_CYPHER(AES_MODE_CBC);
-
-      case CRYPTO_AES_CTR:
-        return AES_CYPHER(AES_MODE_CTR);
-
-#  undef AES_CYPHER
-#endif
-
-      default:
-        return -EINVAL;
-      }
+      sprintf(info->name,"Module_%04d",info->module_index);
+      info->flags = 0;
+      info->nkeys_used = 0;
+      info->nkeys_free = 1;
+      info->nalgs = 1;
+      return 0;
     }
 
+  case CIOCRYPTO_CONTEXT_OPEN:
+  case CIOCRYPTO_CONTEXT_CLOSE:
+  case CIOCRYPTO_CONTEXT_INFO:
+  case CIOCRYPTO_ALG_INFO:
+  case CIOCRYPTO_ALG_SETPARAM:
+  case CIOCRYPTO_KEY_FIND:
+  case CIOCRYPTO_KEY_INFO:
+  case CIOCRYPTO_KEY_CREATE:
+  case CIOCRYPTO_KEY_DELETE:
+  case CIOCRYPTO_KEY_SETVALUE:
+  case CIOCRYPTO_KEY_TRANSFER:
+  case CIOCRYPTO_CIPHER_INIT:
+  case CIOCRYPTO_CIPHER_UPDATE:
+  case CIOCRYPTO_CIPHER_FINAL:
+  case CIOCRYPTO_DS_INIT:
+  case CIOCRYPTO_DS_UPDATE:
+  case CIOCRYPTO_DS_FINAL:
+  case CIOCRYPTO_HASH_INIT:
+  case CIOCRYPTO_HASH_UPDATE:
+  case CIOCRYPTO_HASH_FINAL:
+  case CIOCRYPTO_DERIVE:
+  case CIOCRYPTO_WRAP:
+  case CIOCRYPTO_UNWRAP:
+  case CIOCRYPTO_GEN_RANDOM:
+    return -EACCES;
+	
   default:
     return -EINVAL;
   }
@@ -164,5 +160,6 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
 
 void devcrypto_register(void)
 {
+  cryptdbg("Registering /dev/crypto device\n");
   (void)register_driver("/dev/crypto", &g_cryptodevops, 0666, NULL);
 }

@@ -1,5 +1,5 @@
 /****************************************************************************
- * libc/crypto/lib_crypto_token_count.c
+ * crypto/cryptocore.c
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
@@ -33,4 +33,31 @@
  *
  ****************************************************************************/
 
+/*Functions used by cryptographic module implementations*/
+
+/****************************************************************************
+ * Included Files
+ ****************************************************************************/
+
+#include <nuttx/config.h>
+
+/****************************************************************************
+ * Public Functions
+ ****************************************************************************/
+
+ /****************************************************************************
+ * Name: cryptomod_register
+ *
+ * Description:
+ *   Registers a new cryptographic module and make it available
+ *   to the cryptographic core. Basically we just add it to a linked list.
+ *
+ **************************************************************************/
+
+int cryptomod_register(char *name, struct cryptomod_operations *ops)
+{
+  /*alloc mem*/
+  /*link*/
+  /*populate*/
+}
 

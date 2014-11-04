@@ -1,8 +1,7 @@
 ############################################################################
-# crypto/Makefile
+# libc/crypto/Make.defs
 #
-#   Copyright (C) 2007, 2008, 2011-2014 Gregory Nutt. All rights reserved.
-#   Author: Gregory Nutt <gnutt@nuttx.org>
+#   Copyright (C) 2014 Gregory Nutt. All rights reserved.
 #   Author: Sebastien Lorquet <sebastien@lorquet.fr>
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,55 +33,51 @@
 #
 ############################################################################
 
--include $(TOPDIR)/Make.defs
+# Add the crypto API files to the build
 
-ifeq ($(CONFIG_CRYPTO),y)
+CSRCS += lib_crypto_init.c
+CSRCS += lib_crypto_init_fd.c
+CSRCS += lib_crypto_close.c
 
-# Basic
-# cryptodev support is mandatory
-# TODO move testmngr.c into crypto application (or in specific app)
+CSRCS += lib_crypto_cipher_final.c
+CSRCS += lib_crypto_cipher_init.c
+CSRCS += lib_crypto_cipher_update.c
 
-CRYPTO_ASRCS  =
-CRYPTO_CSRCS  = cryptocore.c cryptodev.c
+CSRCS += lib_crypto_derive.c
 
-endif # CONFIG_CRYPTO
+CSRCS += lib_crypto_ds_final.c
+CSRCS += lib_crypto_ds_init.c
+CSRCS += lib_crypto_ds_update.c
 
-ASRCS		= $(CRYPTO_ASRCS)
-AOBJS		= $(ASRCS:.S=$(OBJEXT))
+CSRCS += lib_crypto_hash_final.c
+CSRCS += lib_crypto_hash_init.c
+CSRCS += lib_crypto_hash_update.c
 
-CSRCS		= $(CRYPTO_CSRCS)
-COBJS		= $(CSRCS:.c=$(OBJEXT))
+CSRCS += lib_crypto_key_create.c
+CSRCS += lib_crypto_key_delete.c
+CSRCS += lib_crypto_key_find.c
+CSRCS += lib_crypto_key_info.c
+CSRCS += lib_crypto_key_setvalue.c
+CSRCS += lib_crypto_key_transfer.c
 
-SRCS		= $(ASRCS) $(CSRCS)
-OBJS		= $(AOBJS) $(COBJS)
+CSRCS += lib_crypto_alg_info.c
+CSRCS += lib_crypto_alg_name.c
+CSRCS += lib_crypto_alg_setparam.c
 
-BIN		= libcrypto$(LIBEXT)
+CSRCS += lib_crypto_random_generate.c
 
-all:	$(BIN)
+CSRCS += lib_crypto_context_close.c
+CSRCS += lib_crypto_context_info.c
+CSRCS += lib_crypto_context_open.c
 
-$(AOBJS): %$(OBJEXT): %.S
-	$(call ASSEMBLE, $<, $@)
+CSRCS += lib_crypto_module_count.c
+CSRCS += lib_crypto_module_info.c
 
-$(COBJS): %$(OBJEXT): %.c
-	$(call COMPILE, $<, $@)
+CSRCS += lib_crypto_unwrap.c
 
-$(BIN): $(OBJS)
-	$(call ARCHIVE, $@, $(OBJS))
+CSRCS += lib_crypto_wrap.c
 
-.depend: Makefile $(SRCS)
-ifeq ($(CONFIG_CRYPTO),y)
-	$(Q) $(MKDEP) --dep-path . "$(CC)" -- $(CFLAGS) -- $(SRCS) >Make.dep
-endif
-	$(Q) touch $@
+# Add the crypto directory to the build
 
-depend: .depend
-
-clean:
-	$(call DELFILE, $(BIN))
-	$(call CLEAN)
-
-distclean: clean
-	$(call DELFILE, Make.dep)
-	$(call DELFILE, .depend)
-
--include Make.dep
+DEPPATH += --dep-path crypto
+VPATH += :crypto

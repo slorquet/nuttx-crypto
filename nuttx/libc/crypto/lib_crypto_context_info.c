@@ -1,5 +1,5 @@
 /****************************************************************************
- * libc/crypto/lib_crypto_random_generate.c
+ * libc/crypto/lib_crypto_context_info.c
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
@@ -61,14 +61,14 @@ extern int g_crypto_fd;
  ****************************************************************************/
 
 /****************************************************************************
- * Name: crypto_random_generate
+ * Name: crypto_context_info
  *
  * Description:
  *   todo
  *
  **************************************************************************/
 
-int crypto_random_generate(int context_id, int len, uint8_t *data)
+int crypto_context_info(int context_id, struct crypto_context_info_s *sess)
 {
   return 0;
 }

@@ -1,5 +1,5 @@
 /****************************************************************************
- * libc/crypto/lib_crypto_random_generate.c
+ * libc/crypto/lib_crypto_init.c
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
@@ -39,6 +39,7 @@
 
 #include <nuttx/config.h>
 
+#include <fcntl.h>
 #include <nuttx/crypto/cryptodev.h>
 #include <nuttx/crypto/crypto.h>
 
@@ -50,7 +51,7 @@
  * Private Data
  ****************************************************************************/
 
-extern int g_crypto_fd;
+int g_crypto_fd;
 
 /****************************************************************************
  * Private Functions
@@ -61,14 +62,16 @@ extern int g_crypto_fd;
  ****************************************************************************/
 
 /****************************************************************************
- * Name: crypto_random_generate
+ * Name: crypto_init
  *
  * Description:
  *   todo
  *
  **************************************************************************/
 
-int crypto_random_generate(int context_id, int len, uint8_t *data)
+int crypto_init(void)
 {
-  return 0;
+  g_crypto_fd = open("/dev/crypto",O_RDWR);
+  return g_crypto_fd;
 }
+

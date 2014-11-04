@@ -195,13 +195,13 @@ void up_initialize(void)
 #endif
 
 #if defined(CONFIG_CRYPTO)
-  up_cryptoinitialize();
+  up_cryptoinitialize(); /* Initialize the cryptographic core */
+  devcrypto_register(); /* Create /dev/crypto */
 #endif
-
-#if defined(CONFIG_CRYPTO_CRYPTODEV)
-  devcrypto_register(); /* /dev/crypto */
+#if defined(CONFIG_CRYPTO_SOFTMODULE)
+  
 #endif
-
+)
 #if defined(CONFIG_DEV_ZERO)
   devzero_register();   /* Standard /dev/zero */
 #endif

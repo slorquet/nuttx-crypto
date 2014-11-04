@@ -1,5 +1,5 @@
 /****************************************************************************
- * libc/crypto/lib_crypto_mech_name.c
+ * crypto/cryptocore.h
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
@@ -33,4 +33,16 @@
  *
  ****************************************************************************/
 
+#ifndef __CRYPTO_CRYPTOCORE_H
+#define __CRYPTO_CRYPTOCORE_H
+
+struct cryptocore_module_s
+{
+  struct cryptocore_module_s *next;
+  char name[16];
+};
+
+struct cryptocore_module_s *cryptocore_module_find(char *name, uint32_t id);
+
+#endif // __CRYPTO_CRYPTOCORE_H
 

@@ -41,6 +41,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
+#include <nuttx/crypto/crypto.h>
 
 /****************************************************************************
  * Definitions
@@ -54,22 +55,42 @@
  * Public Functions
  ****************************************************************************/
 
+void usage(void)
+{
+  printf(
+    "Example Tool for crypto API\n"
+    "cryptool <CMD> [args]\n"
+    "  modlist       list available modules\n"
+    "  keylist <id>  list all keys in a modules\n"
+    "\n"
+    "Report bugs to nuttx@yahoogroups.com and sebastien@lorquet.fr\n"
+  );
+}
+
+void modules_list(void)
+{
+  struct crypto_module_info_s info;
+  int i,err;
+  int count = crypto_module_count();
+  printf("Number of available modules: %d\n",count);
+  for(i=0;i<count;i++)
+  {
+    err=crypto_module_info(i,&info);
+    if(!err)
+    {
+      printf("%2d [%16s] %08X %d/%d\n",i,info.name,info.flags,info.nkeys_used,info.nkeys_free);
+    }
+    else
+    {
+      printf("%2d Cannot get info, err=%d\n",i,err);
+    }
+  }
+}
+ 
 /****************************************************************************
  * crypto_main
  ****************************************************************************/
 
-void usage(void)
-{
-  printf(
-    "tool for crypto API\n"
-    "cryptool <CMD> [args]\n"
-    "  toklist       list available tokens\n"
-    "  tokinfo <id>  info about a token\n"
-    "  keylist <id>  list all keys in a token\n"
-    "\n"
-    "report bugs to nuttx@yahoogroups.com and sebastien@lorquet.fr\n"
-  );
-}
 
 #ifdef CONFIG_BUILD_KERNEL
 int main(int argc, FAR char *argv[])
@@ -91,25 +112,24 @@ int cryptool_main(int argc, char *argv[])
     printf("cannot open /dev/crypto\n");
     return 1;
   }
+
+  crypto_init_fd(fd);
   
-  if(!strcmp(argv[1], "toklist"))
+  if(!strcmp(argv[1], "modlist"))
   {
     //enumerate tokens
-  }
-  else if(!strcmp(argv[1], "tokinfo"))
-  {
-    //retrieve token info
+    modules_list();
   }
   else if(!strcmp(argv[1], "keylist"))
   {
-    //enumerate keys in a token
+    //enumerate keys in a module
   }
   else
   {
     printf("unknown command '%s'\n", argv[1]);
   }
 
-  close(fd);
+  crypto_close();
   
   return 0;
 }

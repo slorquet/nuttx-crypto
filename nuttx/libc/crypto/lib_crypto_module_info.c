@@ -1,8 +1,8 @@
 /****************************************************************************
- * crypto/crypto.c
+ * libc/crypto/lib_crypto_module_info.c
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
- *   Author:  Max Nekludov <macscomp@gmail.com>
+ *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,22 +39,18 @@
 
 #include <nuttx/config.h>
 
-#include <sys/types.h>
-#include <stdbool.h>
-#include <string.h>
-#include <poll.h>
-#include <errno.h>
-
-#include <nuttx/fs/fs.h>
+#include <nuttx/crypto/cryptodev.h>
 #include <nuttx/crypto/crypto.h>
 
 /****************************************************************************
- * Private Function Prototypes
+ * Pre-processor Definitions
  ****************************************************************************/
 
 /****************************************************************************
  * Private Data
  ****************************************************************************/
+
+extern int g_crypto_fd;
 
 /****************************************************************************
  * Private Functions
@@ -64,23 +60,27 @@
  * Public Functions
  ****************************************************************************/
 
-void up_cryptoinitialize(void)
+/****************************************************************************
+ * Name: crypto_module_info
+ *
+ * Description:
+ *   Given its index, retrieve live information about a crypto module.
+ *
+ **************************************************************************/
+
+int crypto_module_info(int module_id, struct crypto_module_info_s *info)
 {
-  int res = OK;
-
-#if defined(CONFIG_CRYPTO_AES)
-  res = up_aesinitialize();
-  if (res)
-    return res;
-#endif
-
-#if defined(CONFIG_CRYPTO_ALGTEST)
-  res = crypto_test();
-  if (res)
-    cryptlldbg("crypto test failed\n");
-  else
-    cryptllvdbg("crypto test OK\n");
-#endif
-
-  return res;
+  struct cryptodev_module_info_s devinfo;
+  int err;
+  devinfo.module_index = module_id;
+  err = ioctl(g_crypto_fd, CIOCRYPTO_MODULE_INFO, (unsigned long)&devinfo);
+  if(!err)
+  {
+    //Okay, copy info
+    memcpy(info->name, devinfo.name, 16);
+    info->flags      = devinfo.flags;
+    info->nkeys_used = devinfo.nkeys_used;
+    info->nkeys_free = devinfo.nkeys_free;
+  }
+  return err;
 }

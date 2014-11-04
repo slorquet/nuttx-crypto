@@ -1,5 +1,5 @@
 /****************************************************************************
- * libc/crypto/lib_crypto_random_generate.c
+ * drivers/crypto/softmod/softmod.c
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
@@ -39,36 +39,28 @@
 
 #include <nuttx/config.h>
 
-#include <nuttx/crypto/cryptodev.h>
-#include <nuttx/crypto/crypto.h>
+#include <nuttx/crypto/cryptomod.h>
 
-/****************************************************************************
- * Pre-processor Definitions
- ****************************************************************************/
+//Private data
 
-/****************************************************************************
- * Private Data
- ****************************************************************************/
-
-extern int g_crypto_fd;
-
-/****************************************************************************
- * Private Functions
- ****************************************************************************/
+static struct cryptomod_operations g_softcryptomodops =
+{
+  0 //dummy
+  //enum algs
+  //find,store,delete key
+  //cipher ops
+  //ds ops
+  //hash ops
+  //derive,wrap,unwrap
+  //genrandom
+};
 
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
 
-/****************************************************************************
- * Name: crypto_random_generate
- *
- * Description:
- *   todo
- *
- **************************************************************************/
-
-int crypto_random_generate(int context_id, int len, uint8_t *data)
+void crypto_softmod_register(void)
 {
-  return 0;
+  cryptomod_register("software", &g_softcryptomodops);
 }
+
