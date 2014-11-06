@@ -142,7 +142,7 @@ int crypto_module_info(int tokenid, FAR struct crypto_module_info_s *info);
 
 int crypto_context_open(int tokenid, uint32_t flags, FAR const char *pin);
 int crypto_context_close(int contextid);
-int crypto_context_info(int contextid, FAR struct crypto_contextinfo_s *sess);
+int crypto_context_info(int contextid, FAR struct crypto_context_info_s *sess);
 
 int crypto_alg_info(int token, int mech, FAR struct crypto_alg_info_s *info);
 const char *crypto_alg_name(int mechid);
