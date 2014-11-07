@@ -125,7 +125,10 @@ int cryptool_main(int argc, char *argv[])
       /* enumerate keys in a module */
       /* need an arg: module index */
       if(argc!=3)
-    
+        {
+          usage();
+          return 1;
+        }
     }
   else
     {
