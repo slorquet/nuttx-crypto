@@ -194,13 +194,6 @@ void up_initialize(void)
   devnull_register();   /* Standard /dev/null */
 #endif
 
-#if defined(CONFIG_CRYPTO)
-  up_cryptoinitialize(); /* Initialize the cryptographic core */
-  devcrypto_register(); /* Create /dev/crypto */
-#endif
-#if defined(CONFIG_CRYPTO_SOFTMODULE)
-  
-#endif
 
 #if defined(CONFIG_DEV_ZERO)
   devzero_register();   /* Standard /dev/zero */
@@ -237,6 +230,16 @@ void up_initialize(void)
 #endif
 #ifdef CONFIG_RAMLOG_SYSLOG
   ramlog_sysloginit();
+#endif
+
+  /* Initialize the cryptographic framework */
+
+#if defined(CONFIG_CRYPTO)
+  up_cryptoinitialize(); /* Initialize the cryptographic core */
+  devcrypto_register(); /* Create /dev/crypto */
+#  if defined(CONFIG_CRYPTO_SOFTMODULE)
+  crypto_softmod_register(); /*initialize the software-only cryptographic module*/
+#  endif
 #endif
 
   /* Initialize the network */

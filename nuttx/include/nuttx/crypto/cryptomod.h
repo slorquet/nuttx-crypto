@@ -38,7 +38,9 @@
 #ifndef __INCLUDE_NUTTX_CRYPTO_CRYPTOMOD_H
 #define __INCLUDE_NUTTX_CRYPTO_CRYPTOMOD_H
 
-struct cryptomod_operations
+#include <stdint.h>
+
+struct cryptomod_operations_s
 {
   uint32_t dummy;
   //enum algs
@@ -50,6 +52,10 @@ struct cryptomod_operations
   //genrandom
 };
 
-int cryptomod_register(char *name, struct cryptomod_operations *ops);
+int cryptomod_register(char *name, FAR struct cryptomod_operations_s *ops);
+
+#ifdef CONFIG_CRYPTO_SOFTMODULE
+void crypto_softmod_register(void);
+#endif
 
 #endif /* __INCLUDE_NUTTX_CRYPTO_CRYPTOMOD_H */

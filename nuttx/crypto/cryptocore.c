@@ -49,6 +49,7 @@
 #include <debug.h>
 
 #include <nuttx/fs/fs.h>
+#include <nuttx/crypto/cryptomod.h>
 #include "cryptocore.h"
 
 /****************************************************************************
@@ -58,7 +59,7 @@
 /****************************************************************************
  * Private Data
  ****************************************************************************/
-struct cryptocore_module_t *modules_head;
+struct cryptocore_module_s *modules_head;
 
 /****************************************************************************
  * Private Functions
@@ -89,6 +90,12 @@ struct cryptocore_module_s *cryptocore_module_find(char *name, uint32_t id)
     }
   }
   return NULL;
+}
+
+int cryptomod_register(char *name, struct cryptomod_operations_s *ops)
+{
+  cryptdbg("registering: %s",name);
+  return 0;
 }
 
  /****************************************************************************

@@ -43,7 +43,7 @@
 
 //Private data
 
-static struct cryptomod_operations g_softcryptomodops =
+static struct cryptomod_operations_s g_softcryptomodops =
 {
   0 //dummy
   //enum algs
