@@ -6,6 +6,7 @@
 config EXAMPLES_CRYPTO
 	bool "Cryptographic API tool"
 	default n
+	depends on CRYPTO
 	---help---
 		Enable the Crypto tool
 
