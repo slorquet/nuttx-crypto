@@ -52,6 +52,8 @@
 #include <nuttx/crypto/cryptomod.h>
 #include "cryptocore.h"
 
+#define max(a,b) ((a)>(b)?(a):(b))
+
 /****************************************************************************
  * Private Function Prototypes
  ****************************************************************************/
@@ -59,7 +61,12 @@
 /****************************************************************************
  * Private Data
  ****************************************************************************/
-struct cryptocore_module_s *modules_head;
+FAR struct cryptocore_module_s  *modules_head;
+FAR struct cryptocore_session_s *sessions_head;
+
+#ifdef CONFIG_CRYPTO_SESSION_CACHE
+FAR struct cryptocore_session_s *sessions_cache[CONFIG_CRYPTO_SESSION_CACHE_COUNT];
+#endif
 
 /****************************************************************************
  * Private Functions
@@ -73,29 +80,62 @@ struct cryptocore_module_s *modules_head;
  * Name: cryptocore_module_find
  *
  * Description:
- *   Returns a crypto module structure given a module name.
+ *   if name is null, Returns a crypto module structure given its index.
+ *   else, Returns a crypto module structure given its name.
  *   If the module is not found, returns NULL.
- *   TODO constant time search
  *
  **************************************************************************/
 
-struct cryptocore_module_s *cryptocore_module_find(char *name, uint32_t id)
+FAR struct cryptocore_module_s *cryptocore_module_find(FAR char *modname, uint32_t modid)
 {
-  struct cryptocore_module_s *cur;
-  for(cur = modules_head; cur != NULL; cur = cur->next)
-  {
-    if(!strncmp(cur->name, name, 16))
+  FAR struct cryptocore_module_s *cur;
+  char locname[16];
+  int index = 0;
+
+  memcpy(locname, modname, max(strlen(modname),16) );
+  cryptlldbg("name=%s id=%d\n", modname, modid);
+
+  for (cur = modules_head; cur != NULL; cur = cur->next)
     {
-      return cur;
+      if (modname)
+        {
+          /*find by name*/
+          if(!memcmp(cur->name, locname, 16))
+            {
+              return cur;
+            }
+        }
+      else
+        {
+          /*find by ID*/
+          if (index==modid)
+            {
+              return cur;
+            }
+        }
     }
-  }
   return NULL;
 }
 
-int cryptomod_register(char *name, struct cryptomod_operations_s *ops)
+ /****************************************************************************
+ * Name: cryptocore_module_count
+ *
+ * Description:
+ *   Returns the number of registered modules
+ *
+ **************************************************************************/
+
+int cryptocore_module_count(void)
 {
-  cryptdbg("registering: %s",name);
-  return 0;
+  FAR struct cryptocore_module_s *cur;
+  int count = 0;
+
+  for (cur = modules_head; cur != NULL; cur = cur->next)
+    {
+      count++;
+    }
+
+  return count;
 }
 
  /****************************************************************************
@@ -111,17 +151,18 @@ int up_cryptoinitialize(void)
 {
   int res = OK;
 
-  cryptdbg("Starting crypto core initialization\n");
-  //Initialize an empty list of crypto modules
-  //This list will be populated when board specific code calls cryptocore_module_register
+  cryptlldbg("Starting crypto core initialization\n");
+
+  /*
+   * Initialize an empty list of crypto modules
+   * This list will be populated when board specific code calls cryptocore_module_register
+   */
+
   modules_head = NULL;
+
+  /* Initialize list of dynamic sessions */
   
-#ifdef CONFIG_CRYPTO_CONTEXT_STATIC
-  //Setup variables in static session
-  //Number of keys is CRYPTO_CONTEXT_STATIC_KEYS
-#endif
-  
-  //Initialize list of dynamic sessions
+  sessions_head = NULL;
 
   return res;
 }

@@ -238,7 +238,7 @@ void up_initialize(void)
   up_cryptoinitialize(); /* Initialize the cryptographic core */
   devcrypto_register(); /* Create /dev/crypto */
 #  if defined(CONFIG_CRYPTO_SOFTMODULE)
-  crypto_softmod_register(); /*initialize the software-only cryptographic module*/
+  cryptomod_softmod_register(); /*initialize the software-only cryptographic module*/
 #  endif
 #endif
 

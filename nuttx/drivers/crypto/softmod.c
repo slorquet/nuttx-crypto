@@ -40,6 +40,7 @@
 #include <nuttx/config.h>
 
 #include <nuttx/crypto/cryptomod.h>
+#include <nuttx/crypto/crypto.h>
 
 //Private data
 
@@ -59,8 +60,8 @@ static struct cryptomod_operations_s g_softcryptomodops =
  * Public Functions
  ****************************************************************************/
 
-void crypto_softmod_register(void)
+void cryptomod_softmod_register(void)
 {
-  cryptomod_register("software", &g_softcryptomodops);
+  cryptomod_register("software", &g_softcryptomodops, 0);
 }
 

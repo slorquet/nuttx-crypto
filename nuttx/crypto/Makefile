@@ -43,7 +43,7 @@ ifeq ($(CONFIG_CRYPTO),y)
 # TODO move testmngr.c into crypto application (or in specific app)
 
 CRYPTO_ASRCS  =
-CRYPTO_CSRCS  = cryptocore.c cryptodev.c
+CRYPTO_CSRCS  = cryptocore.c cryptomod.c cryptodev.c
 
 endif # CONFIG_CRYPTO
 

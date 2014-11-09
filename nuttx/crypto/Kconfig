@@ -11,16 +11,21 @@ config CRYPTO
 
 if CRYPTO
 
-config CRYPTO_CONTEXT_STATIC
-  bool "Enable Statically allocated session"
+config CRYPTO_SESSION_CACHE
+  bool "Enable Session Cache"
   default n
+  ---help---
+    The session cache is used to improve performances
 
-config CRYPTO_CONTEXT_STATIC_KEYS
-  int "Number of keys usable in the static context"
-  default 2
+if CRYPTO_SESSION_CACHE
 
-config CRYPTO_CONTEXT_DYNAMIC_LIMIT
-  int "Limit the max number of dynamic contexts (0 for no limit)"
-  default 0
+config CRYPTO_SESSION_CACHE_COUNT
+  int "Session Cache entries"
+  default 1
+  ---help---
+    The correct value here is the number of expected concurrently accessed sessions.
 
 endif
+
+endif
+

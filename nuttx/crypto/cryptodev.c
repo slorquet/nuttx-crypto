@@ -44,12 +44,14 @@
 #include <poll.h>
 #include <errno.h>
 #include <debug.h>
-#include <stdio.h>
+#include <string.h>
 
 #include <nuttx/fs/fs.h>
 
 #include <nuttx/crypto/crypto.h>
 #include <nuttx/crypto/cryptodev.h>
+
+#include "cryptocore.h"
 
 /****************************************************************************
  * Private Function Prototypes
@@ -103,23 +105,29 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
   {
   case CIOCRYPTO_MODULE_COUNT:
     {
-      int *dest = (int*)arg;
-      *dest = 3;
+      FAR int *dest = (FAR int*)arg;
+      cryptlldbg("Requesting module count\n");
+      *dest = cryptocore_module_count();
       return 0;
     }
 	
   case CIOCRYPTO_MODULE_INFO:
     {
-      struct cryptodev_module_info_s *info = (struct cryptodev_module_info_s*)arg;
-      if(info->module_index>2)
-      {
-        return -ENODEV;
-      }
-      sprintf(info->name,"Module_%04d",info->module_index);
-      info->flags = 0;
+      FAR struct cryptodev_module_info_s *info = (FAR struct cryptodev_module_info_s*)arg;
+      FAR struct cryptocore_module_s     *mod;
+
+      cryptlldbg("Requesting module info (%d)\n", info->module_index);
+      mod = cryptocore_module_find(NULL, info->module_index);
+      if (mod == NULL)
+        {
+          return -ENODEV;
+        }
+
+      memcpy(info->name, mod->name, 16);
+      info->flags      = mod->flags;
       info->nkeys_used = 0;
       info->nkeys_free = 1;
-      info->nalgs = 1;
+      info->nalgs      = 1;
       return 0;
     }
 
@@ -160,6 +168,7 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
 
 void devcrypto_register(void)
 {
-  cryptdbg("Registering /dev/crypto device\n");
+  cryptlldbg("Registering /dev/crypto device\n");
   (void)register_driver("/dev/crypto", &g_cryptodevops, 0666, NULL);
 }
+

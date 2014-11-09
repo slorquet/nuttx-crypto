@@ -52,10 +52,10 @@ struct cryptomod_operations_s
   //genrandom
 };
 
-int cryptomod_register(char *name, FAR struct cryptomod_operations_s *ops);
+int cryptomod_register(char *name, FAR struct cryptomod_operations_s *ops, uint32_t flags);
 
 #ifdef CONFIG_CRYPTO_SOFTMODULE
-void crypto_softmod_register(void);
+void cryptomod_softmod_register(void);
 #endif
 
 #endif /* __INCLUDE_NUTTX_CRYPTO_CRYPTOMOD_H */
