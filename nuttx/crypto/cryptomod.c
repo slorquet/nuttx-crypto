@@ -1,5 +1,5 @@
 /****************************************************************************
- * crypto/cryptocore.c
+ * crypto/cryptomod.c
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
@@ -70,8 +70,8 @@ extern struct cryptocore_module_s *modules_head;
 int cryptomod_register(char *name, FAR struct cryptomod_operations_s *ops, uint32_t flags)
 {
   FAR struct cryptocore_module_s *mod;
-  char locname[16];
-  int  namelen;
+  char                           locname[16];
+  int                            namelen;
 
   cryptlldbg("registering: %s\n",name);
 
@@ -95,11 +95,11 @@ int cryptomod_register(char *name, FAR struct cryptomod_operations_s *ops, uint3
 
   for (mod = modules_head; mod != NULL; mod = mod->next)
     {
-    if (memcmp(mod->name, name, 16))
-      {
-        cryptlldbg("ERROR: module already exists\n");
-        return -EEXIST;
-      }
+      if (memcmp(mod->name, name, 16))
+        {
+          cryptlldbg("ERROR: module already exists\n");
+          return -EEXIST;
+        }
     }
 
   /* allocate the module */

@@ -102,64 +102,64 @@ static ssize_t cryptodev_write(FAR struct file *filep, FAR const char *buffer,
 static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
 {
   switch(cmd)
-  {
-  case CIOCRYPTO_MODULE_COUNT:
     {
-      FAR int *dest = (FAR int*)arg;
-      cryptlldbg("Requesting module count\n");
-      *dest = cryptocore_module_count();
-      return 0;
-    }
-	
-  case CIOCRYPTO_MODULE_INFO:
-    {
-      FAR struct cryptodev_module_info_s *info = (FAR struct cryptodev_module_info_s*)arg;
-      FAR struct cryptocore_module_s     *mod;
-
-      cryptlldbg("Requesting module info (%d)\n", info->module_index);
-      mod = cryptocore_module_find(NULL, info->module_index);
-      if (mod == NULL)
+      case CIOCRYPTO_MODULE_COUNT:
         {
-          return -ENODEV;
+          FAR int *dest = (FAR int*)arg;
+          cryptlldbg("Requesting module count\n");
+          *dest = cryptocore_module_count();
+          return 0;
+        }
+	
+      case CIOCRYPTO_MODULE_INFO:
+        {
+          FAR struct cryptodev_module_info_s *info = (FAR struct cryptodev_module_info_s*)arg;
+          FAR struct cryptocore_module_s     *mod;
+
+          cryptlldbg("Requesting module info (%d)\n", info->module_index);
+          mod = cryptocore_module_find(NULL, info->module_index);
+          if (mod == NULL)
+            {
+              return -ENODEV;
+            }
+
+          memcpy(info->name, mod->name, 16);
+          info->flags      = mod->flags;
+          info->nkeys_used = 0;
+          info->nkeys_free = 1;
+          info->nalgs      = 1;
+          return 0;
         }
 
-      memcpy(info->name, mod->name, 16);
-      info->flags      = mod->flags;
-      info->nkeys_used = 0;
-      info->nkeys_free = 1;
-      info->nalgs      = 1;
-      return 0;
-    }
-
-  case CIOCRYPTO_CONTEXT_OPEN:
-  case CIOCRYPTO_CONTEXT_CLOSE:
-  case CIOCRYPTO_CONTEXT_INFO:
-  case CIOCRYPTO_ALG_INFO:
-  case CIOCRYPTO_ALG_SETPARAM:
-  case CIOCRYPTO_KEY_FIND:
-  case CIOCRYPTO_KEY_INFO:
-  case CIOCRYPTO_KEY_CREATE:
-  case CIOCRYPTO_KEY_DELETE:
-  case CIOCRYPTO_KEY_SETVALUE:
-  case CIOCRYPTO_KEY_TRANSFER:
-  case CIOCRYPTO_CIPHER_INIT:
-  case CIOCRYPTO_CIPHER_UPDATE:
-  case CIOCRYPTO_CIPHER_FINAL:
-  case CIOCRYPTO_DS_INIT:
-  case CIOCRYPTO_DS_UPDATE:
-  case CIOCRYPTO_DS_FINAL:
-  case CIOCRYPTO_HASH_INIT:
-  case CIOCRYPTO_HASH_UPDATE:
-  case CIOCRYPTO_HASH_FINAL:
-  case CIOCRYPTO_DERIVE:
-  case CIOCRYPTO_WRAP:
-  case CIOCRYPTO_UNWRAP:
-  case CIOCRYPTO_GEN_RANDOM:
-    return -EACCES;
+      case CIOCRYPTO_CONTEXT_OPEN:
+      case CIOCRYPTO_CONTEXT_CLOSE:
+      case CIOCRYPTO_CONTEXT_INFO:
+      case CIOCRYPTO_ALG_INFO:
+      case CIOCRYPTO_ALG_SETPARAM:
+      case CIOCRYPTO_KEY_FIND:
+      case CIOCRYPTO_KEY_INFO:
+      case CIOCRYPTO_KEY_CREATE:
+      case CIOCRYPTO_KEY_DELETE:
+      case CIOCRYPTO_KEY_SETVALUE:
+      case CIOCRYPTO_KEY_TRANSFER:
+      case CIOCRYPTO_CIPHER_INIT:
+      case CIOCRYPTO_CIPHER_UPDATE:
+      case CIOCRYPTO_CIPHER_FINAL:
+      case CIOCRYPTO_DS_INIT:
+      case CIOCRYPTO_DS_UPDATE:
+      case CIOCRYPTO_DS_FINAL:
+      case CIOCRYPTO_HASH_INIT:
+      case CIOCRYPTO_HASH_UPDATE:
+      case CIOCRYPTO_HASH_FINAL:
+      case CIOCRYPTO_DERIVE:
+      case CIOCRYPTO_WRAP:
+      case CIOCRYPTO_UNWRAP:
+      case CIOCRYPTO_GEN_RANDOM:
+        return -EACCES;
 	
-  default:
-    return -EINVAL;
-  }
+      default:
+        return -EINVAL;
+    }
 }
 
 /****************************************************************************

@@ -1,5 +1,5 @@
 /****************************************************************************
- * drivers/crypto/softmod/softmod.c
+ * drivers/crypto/softmod.c
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
