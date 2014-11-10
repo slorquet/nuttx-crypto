@@ -39,21 +39,44 @@
 
 #include <nuttx/config.h>
 
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <nuttx/crypto/cryptomod.h>
 #include <nuttx/crypto/crypto.h>
+
+static unsigned char g_authenticated = FALSE;
+
+int softmod_key_count(FAR int *used, FAR int *avail)
+{
+  *used = 1;
+  *avail = 1;
+  return 0;
+}
+
+int softmod_authenticate(FAR char *pin, int pinlen, uint32_t flags)
+{
+  /*UNBELIEVABLY INSECURE PIN CHECK*/
+  if(pinlen!=4) return -EACCES;
+  if(strcmp(pin,"1234")) return -EACCES;
+  g_authenticated = TRUE;
+  return 0;
+}
 
 //Private data
 
 static struct cryptomod_operations_s g_softcryptomodops =
 {
-  0 //dummy
-  //enum algs
-  //find,store,delete key
-  //cipher ops
-  //ds ops
-  //hash ops
-  //derive,wrap,unwrap
-  //genrandom
+  softmod_authenticate,
+  /*keys management*/
+  softmod_key_count,
+  /*algs management*/
+  /*cipher ops*/
+  /*ds ops*/
+  /*hash ops*/
+  /*derive,wrap,unwrap*/
+  /*genrandom*/
 };
 
 /****************************************************************************

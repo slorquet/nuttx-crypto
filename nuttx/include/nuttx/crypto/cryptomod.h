@@ -42,14 +42,15 @@
 
 struct cryptomod_operations_s
 {
-  uint32_t dummy;
-  //enum algs
-  //find,store,delete key
-  //cipher ops
-  //ds ops
-  //hash ops
-  //derive,wrap,unwrap
-  //genrandom
+  int (*authenticate)(FAR char *pin, int pinlen, uint32_t flags);
+  /*keys management*/
+  int (*key_count)(FAR int *used, FAR int *avail);
+  /*algs management*/
+  /*cipher ops*/
+  /*ds ops*/
+  /*hash ops*/
+  /*derive,wrap,unwrap*/
+  /*genrandom*/
 };
 
 int cryptomod_register(char *name, FAR struct cryptomod_operations_s *ops, uint32_t flags);

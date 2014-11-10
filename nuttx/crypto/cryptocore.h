@@ -36,22 +36,25 @@
 #ifndef __CRYPTO_CRYPTOCORE_H
 #define __CRYPTO_CRYPTOCORE_H
 
-struct cryptocore_session_s
-{
-  FAR struct cryptocore_session_s  *next; /* link to the next session in list */
-};
-
 struct cryptocore_module_s
 {
   FAR struct cryptocore_module_s    *next;     /* link to the next module in list */
   char                               name[16]; /* module name, zero padded */
   FAR struct cryptomod_operations_s *ops;      /* device specific operations */
-  int                                sessions; /* number of sessions opened */
+  int                                contexts; /* number of opened contexts */
   uint32_t                           flags;    /* need pin, hardware, etc */
+};
+
+struct cryptocore_context_s
+{
+  FAR struct cryptocore_context_s  *next;   /* link to the next context in list */
+  int                               id;     /* context_id used by communication with clients */
+  FAR struct cryptocore_module_s   *module; /* crypto module hosting this context */
 };
 
 int cryptocore_module_count(void);
 FAR struct cryptocore_module_s *cryptocore_module_find(FAR char *modname, uint32_t modid);
+FAR struct cryptocore_context_s *cryptocore_context_alloc(FAR struct cryptocore_module_s *host);
 
 #endif // __CRYPTO_CRYPTOCORE_H
 

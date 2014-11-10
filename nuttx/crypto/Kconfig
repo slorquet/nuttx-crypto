@@ -11,19 +11,19 @@ config CRYPTO
 
 if CRYPTO
 
-config CRYPTO_SESSION_CACHE
-  bool "Enable Session Cache"
+config CRYPTO_CONTEXT_CACHE
+  bool "Enable Context Cache"
   default n
   ---help---
-    The session cache is used to improve performances
+    The context cache is used to improve performances
 
-if CRYPTO_SESSION_CACHE
+if CRYPTO_CONTEXT_CACHE
 
-config CRYPTO_SESSION_CACHE_COUNT
-  int "Session Cache entries"
+config CRYPTO_CONTEXT_CACHE_COUNT
+  int "Context Cache entries"
   default 1
   ---help---
-    The correct value here is the number of expected concurrently accessed sessions.
+    The correct value here is the number of expected concurrently accessed contexts.
 
 endif
 

@@ -50,6 +50,7 @@
 
 #include <nuttx/crypto/crypto.h>
 #include <nuttx/crypto/cryptodev.h>
+#include <nuttx/crypto/cryptomod.h>
 
 #include "cryptocore.h"
 
@@ -125,14 +126,53 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
 
           memcpy(info->name, mod->name, 16);
           info->flags      = mod->flags;
-          info->nkeys_used = 0;
-          info->nkeys_free = 1;
+          mod->ops->key_count(&info->nkeys_used, &info->nkeys_free);
           info->nalgs      = 1;
           return 0;
         }
 
       case CIOCRYPTO_CONTEXT_OPEN:
+        {
+          FAR struct cryptodev_context_open_s *info = (FAR struct cryptodev_context_open_s*)arg;
+          FAR struct cryptocore_module_s *mod;
+          FAR struct cryptocore_context_s *ctx;
+          int ret;
+
+          cryptlldbg("Opening a context with module (%d)\n", info->module_index);
+          mod = cryptocore_module_find(NULL, info->module_index);
+          if (mod == NULL)
+            {
+              return -ENODEV;
+            }
+
+          ret = mod->ops->authenticate(info->pin, info->pinlen, info->flags);
+          if (ret!=0)
+            {
+              cryptlldbg("Authentication failed");
+              return ret;
+            }
+
+          ctx = cryptocore_context_alloc(mod);
+          if (ctx == NULL)
+            {
+            cryptlldbg("Context creation failed");
+            return -ENOMEM;
+            }
+          else
+            {
+            info->context_id = ctx->id;
+            return 0;
+            }
+        }
+
       case CIOCRYPTO_CONTEXT_CLOSE:
+        {
+          FAR struct cryptodev_context_open_s *info = (FAR struct cryptodev_context_open_s*)arg;
+          int ret;
+
+//          ret = cryptocore_context_destroy(info->)
+        }
+
       case CIOCRYPTO_CONTEXT_INFO:
       case CIOCRYPTO_ALG_INFO:
       case CIOCRYPTO_ALG_SETPARAM:

@@ -67,13 +67,11 @@ extern struct cryptocore_module_s *modules_head;
  *
  **************************************************************************/
 
-int cryptomod_register(char *name, FAR struct cryptomod_operations_s *ops, uint32_t flags)
+int cryptomod_register(FAR char *name, FAR struct cryptomod_operations_s *ops, uint32_t flags)
 {
   FAR struct cryptocore_module_s *mod;
   char                           locname[16];
   int                            namelen;
-
-  cryptlldbg("registering: %s\n",name);
 
   /* truncate the name if too long */
 
@@ -97,7 +95,7 @@ int cryptomod_register(char *name, FAR struct cryptomod_operations_s *ops, uint3
     {
       if (memcmp(mod->name, name, 16))
         {
-          cryptlldbg("ERROR: module already exists\n");
+          cryptlldbg("ERROR: module '%s' already exists\n",name);
           return -EEXIST;
         }
     }
@@ -107,7 +105,7 @@ int cryptomod_register(char *name, FAR struct cryptomod_operations_s *ops, uint3
   mod = (FAR struct cryptocore_module_s*)kmm_zalloc(sizeof(struct cryptocore_module_s));
   if (!mod)
     {
-      cryptlldbg("ERROR: Failed to allocate module\n");
+      cryptlldbg("ERROR: Failed to allocate module '%s'\n",name);
       return -ENOMEM;
     }
 
@@ -119,7 +117,7 @@ int cryptomod_register(char *name, FAR struct cryptomod_operations_s *ops, uint3
   /* Populate the driver entries */
 
   memcpy(mod->name, locname, 16);
-  mod->sessions = 0;
+  mod->contexts = 0;
   mod->ops      = ops;
   mod->flags    = flags;
 

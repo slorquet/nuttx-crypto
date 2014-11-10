@@ -48,6 +48,7 @@
 #include <errno.h>
 #include <debug.h>
 
+#include <nuttx/kmalloc.h>
 #include <nuttx/fs/fs.h>
 #include <nuttx/crypto/cryptomod.h>
 #include "cryptocore.h"
@@ -62,10 +63,18 @@
  * Private Data
  ****************************************************************************/
 FAR struct cryptocore_module_s  *modules_head;
-FAR struct cryptocore_session_s *sessions_head;
+FAR struct cryptocore_context_s *contexts_head;
 
-#ifdef CONFIG_CRYPTO_SESSION_CACHE
-FAR struct cryptocore_session_s *sessions_cache[CONFIG_CRYPTO_SESSION_CACHE_COUNT];
+int context_nextid = 1; /* identifier of the next context to be created */
+
+#ifdef CONFIG_CRYPTO_CONTEXT_CACHE
+struct cryptocore_cache_entry
+{
+  FAR struct cryptocore_context_s *context; /* pointer to the cached context */
+  int                              lru;     /* insertion order, used for eviction */
+};
+
+struct cryptocore_cache_entry_s context_cache[CONFIG_CRYPTO_CONTEXT_CACHE_COUNT];
 #endif
 
 /****************************************************************************
@@ -139,6 +148,108 @@ int cryptocore_module_count(void)
 }
 
  /****************************************************************************
+ * Name: cryptocore_context_alloc
+ *
+ * Description:
+ *   Allocates and initialize a new context for an hosting module.
+ *
+ **************************************************************************/
+
+FAR struct cryptocore_context_s * cryptocore_context_alloc(FAR struct cryptocore_module_s *host)
+{
+  FAR struct cryptocore_context_s *ctx;
+
+  /* allocate */
+
+  ctx = (FAR struct cryptocore_context_s*)kmm_zalloc(sizeof(struct cryptocore_context_s));
+  if (ctx==NULL)
+    {
+      cryptlldbg("ERROR: Failed to allocate a context\n");
+      return NULL;
+    }
+
+  /* link */
+
+  ctx->next = contexts_head;
+  contexts_head = ctx;
+
+  /* populate */
+
+  ctx->module = host;
+  ctx->id     = context_nextid;
+  context_nextid++;
+  host->contexts += 1;
+
+  cryptlldbg("allocated context %d at %p\n", ctx->id, ctx);
+
+  return ctx;
+}
+
+ /****************************************************************************
+ * Name: cryptocore_context_release
+ *
+ * Description:
+ *   Releases all resources used by a context, without attempting to remove it
+ *   from the global contexts list.
+ *
+ **************************************************************************/
+
+int cryptocore_context_release(FAR struct cryptocore_context_s *ctx)
+{
+  cryptlldbg("freeing context %d at %p\n", ctx->id, ctx);
+
+  /* free all temp keys */
+
+  /* free the object */
+
+  kmm_free(ctx);
+
+  return 0;
+}
+
+ /****************************************************************************
+ * Name: cryptocore_context_destroy
+ *
+ * Description:
+ *   Remove a context from the global list, then release it.
+ *
+ **************************************************************************/
+
+int cryptocore_context_destroy(FAR struct cryptocore_context_s *ctx)
+{
+  FAR struct cryptocore_context_s *cur;
+  FAR struct cryptocore_context_s *prev;
+
+  /* browse the context list to find the entry and its parent */
+
+  for (prev = NULL, cur = contexts_head; cur != NULL; prev=cur, cur = cur->next)
+    {
+      if (cur == ctx)
+        {
+          /* entry was found. Action depends on prev */
+
+          if (prev == NULL)
+            {
+              /* we are removing the first entry */
+
+              contexts_head = cur->next;
+            }
+          else
+            {
+              /* we are removing an entry inside the list */
+
+              prev->next = cur->next;
+            }
+          return cryptocore_context_release(cur);
+        }
+    }
+
+    /* if we reach the end of list, the context was not found */
+
+    return -ENOENT;
+}
+
+ /****************************************************************************
  * Name: up_cryptoinitialize
  *
  * Description:
@@ -162,7 +273,7 @@ int up_cryptoinitialize(void)
 
   /* Initialize list of dynamic sessions */
   
-  sessions_head = NULL;
+  contexts_head = NULL;
 
   return res;
 }
