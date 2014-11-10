@@ -55,6 +55,8 @@ struct cryptomod_operations_s
 
 int cryptomod_register(char *name, FAR struct cryptomod_operations_s *ops, uint32_t flags);
 
+int up_cryptoinitialize(void);
+
 #ifdef CONFIG_CRYPTO_SOFTMODULE
 void cryptomod_softmod_register(void);
 #endif

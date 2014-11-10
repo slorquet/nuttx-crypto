@@ -134,8 +134,8 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
       case CIOCRYPTO_CONTEXT_OPEN:
         {
           FAR struct cryptodev_context_open_s *info = (FAR struct cryptodev_context_open_s*)arg;
-          FAR struct cryptocore_module_s *mod;
-          FAR struct cryptocore_context_s *ctx;
+          FAR struct cryptocore_module_s      *mod;
+          FAR struct cryptocore_context_s     *ctx;
           int ret;
 
           cryptlldbg("Opening a context with module (%d)\n", info->module_index);
@@ -152,7 +152,7 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
               return ret;
             }
 
-          ctx = cryptocore_context_alloc(mod);
+          ctx = cryptocore_context_alloc(mod, info->flags);
           if (ctx == NULL)
             {
             cryptlldbg("Context creation failed");
@@ -167,13 +167,35 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
 
       case CIOCRYPTO_CONTEXT_CLOSE:
         {
-          FAR struct cryptodev_context_open_s *info = (FAR struct cryptodev_context_open_s*)arg;
-          int ret;
-
-//          ret = cryptocore_context_destroy(info->)
+          FAR struct cryptocore_context_s *ctx;
+          ctx = cryptocore_context_find( (int)arg );
+          if( ctx == NULL)
+            {
+              return -ENOENT;
+            }
+          return cryptocore_context_destroy(ctx);
         }
 
       case CIOCRYPTO_CONTEXT_INFO:
+        {
+          FAR struct cryptodev_context_info_s *info = (FAR struct cryptodev_context_info_s*)arg;
+          FAR struct cryptocore_context_s *ctx;
+          ctx = cryptocore_context_find( info->context_id );
+          if( ctx == NULL)
+            {
+              return -ENOENT;
+            }
+
+          /* copy the info */
+
+          info->module_id  = ctx->module->id;
+          info->flags      = ctx->flags;
+          info->nkeys_used = ctx->nkeys_used;
+          info->nkeys_free = ctx->nkeys_free;
+
+          return 0;
+        }
+
       case CIOCRYPTO_ALG_INFO:
       case CIOCRYPTO_ALG_SETPARAM:
       case CIOCRYPTO_KEY_FIND:

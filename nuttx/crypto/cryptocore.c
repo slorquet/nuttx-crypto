@@ -65,6 +65,7 @@
 FAR struct cryptocore_module_s  *modules_head;
 FAR struct cryptocore_context_s *contexts_head;
 
+int module_nextid  = 0; /* identifier of the next module to be registered */
 int context_nextid = 1; /* identifier of the next context to be created */
 
 #ifdef CONFIG_CRYPTO_CONTEXT_CACHE
@@ -86,30 +87,71 @@ struct cryptocore_cache_entry_s context_cache[CONFIG_CRYPTO_CONTEXT_CACHE_COUNT]
  ****************************************************************************/
 
  /****************************************************************************
+ * Name: cryptocore_module_alloc
+ *
+ * Description:
+ *   Allocate and link a new module.
+ *   Other fields are initialized in cryptomod.c
+ *
+ **************************************************************************/
+
+FAR struct cryptocore_module_s *cryptocore_module_alloc(void)
+{
+  FAR struct cryptocore_module_s *mod;
+
+  /* allocate */
+
+  mod = (FAR struct cryptocore_module_s*)kmm_zalloc(sizeof(struct cryptocore_module_s));
+
+  /* if successful, link */
+
+  if (mod)
+    {
+      mod->next      = modules_head;
+      modules_head   = mod;
+      mod->id        = module_nextid;
+      module_nextid += 1;
+    }
+
+  return mod;
+}
+
+ /****************************************************************************
  * Name: cryptocore_module_find
  *
  * Description:
- *   if name is null, Returns a crypto module structure given its index.
- *   else, Returns a crypto module structure given its name.
+ *   If name is null, Returns a crypto module structure given its index.
+ *   Else, Returns a crypto module structure given its name.
  *   If the module is not found, returns NULL.
  *
  **************************************************************************/
 
-FAR struct cryptocore_module_s *cryptocore_module_find(FAR char *modname, uint32_t modid)
+FAR struct cryptocore_module_s *cryptocore_module_find(FAR char *modname, int modid)
 {
   FAR struct cryptocore_module_s *cur;
   char locname[16];
-  int index = 0;
+  int namelen;
 
-  memcpy(locname, modname, max(strlen(modname),16) );
   cryptlldbg("name=%s id=%d\n", modname, modid);
+
+  namelen = strlen(modname);
+  if (namelen > 16)
+    {
+      namelen = 16;
+    }
+
+  memcpy(locname, modname, namelen );
+  for (; namelen < 16; namelen++)
+    {
+      locname[namelen]=0;
+    }
 
   for (cur = modules_head; cur != NULL; cur = cur->next)
     {
       if (modname)
         {
           /*find by name*/
-          if(!memcmp(cur->name, locname, 16))
+          if (!memcmp(cur->name, locname, 16))
             {
               return cur;
             }
@@ -117,7 +159,7 @@ FAR struct cryptocore_module_s *cryptocore_module_find(FAR char *modname, uint32
       else
         {
           /*find by ID*/
-          if (index==modid)
+          if (cur->id == modid)
             {
               return cur;
             }
@@ -155,14 +197,15 @@ int cryptocore_module_count(void)
  *
  **************************************************************************/
 
-FAR struct cryptocore_context_s * cryptocore_context_alloc(FAR struct cryptocore_module_s *host)
+FAR struct cryptocore_context_s *cryptocore_context_alloc(FAR struct cryptocore_module_s *host, uint32_t flags)
 {
   FAR struct cryptocore_context_s *ctx;
 
   /* allocate */
 
   ctx = (FAR struct cryptocore_context_s*)kmm_zalloc(sizeof(struct cryptocore_context_s));
-  if (ctx==NULL)
+
+  if (ctx == NULL)
     {
       cryptlldbg("ERROR: Failed to allocate a context\n");
       return NULL;
@@ -170,19 +213,43 @@ FAR struct cryptocore_context_s * cryptocore_context_alloc(FAR struct cryptocore
 
   /* link */
 
-  ctx->next = contexts_head;
+  ctx->next     = contexts_head;
   contexts_head = ctx;
 
   /* populate */
 
-  ctx->module = host;
-  ctx->id     = context_nextid;
-  context_nextid++;
+  ctx->id         = context_nextid;
+  context_nextid += 1;
+  ctx->flags      = flags;
+  ctx->module     = host;
   host->contexts += 1;
 
   cryptlldbg("allocated context %d at %p\n", ctx->id, ctx);
 
   return ctx;
+}
+
+ /****************************************************************************
+ * Name: cryptocore_context_find
+ *
+ * Description:
+ *   Returns a crypto context structure given its ID.
+ *   If the context is not found, returns NULL.
+ *
+ **************************************************************************/
+
+FAR struct cryptocore_context_s *cryptocore_context_find(int ctxid)
+{
+  FAR struct cryptocore_context_s *cur;
+
+  for (cur = contexts_head; cur != NULL; cur = cur->next)
+    {
+      if (cur->id == ctxid)
+        {
+          return cur;
+        }
+    }
+  return NULL;
 }
 
  /****************************************************************************

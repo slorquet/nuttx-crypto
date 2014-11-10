@@ -36,9 +36,12 @@
 #ifndef __CRYPTO_CRYPTOCORE_H
 #define __CRYPTO_CRYPTOCORE_H
 
+#include <stdint.h>
+
 struct cryptocore_module_s
 {
   FAR struct cryptocore_module_s    *next;     /* link to the next module in list */
+  int                                id;       /* module_id used by communication with clients */
   char                               name[16]; /* module name, zero padded */
   FAR struct cryptomod_operations_s *ops;      /* device specific operations */
   int                                contexts; /* number of opened contexts */
@@ -50,11 +53,18 @@ struct cryptocore_context_s
   FAR struct cryptocore_context_s  *next;   /* link to the next context in list */
   int                               id;     /* context_id used by communication with clients */
   FAR struct cryptocore_module_s   *module; /* crypto module hosting this context */
+  uint32_t                          flags;  /* context flags */
+  int                               nkeys_used;
+  int                               nkeys_free;
 };
 
+FAR struct cryptocore_module_s *cryptocore_module_alloc(void);
+FAR struct cryptocore_module_s *cryptocore_module_find(FAR char *modname, int modid);
 int cryptocore_module_count(void);
-FAR struct cryptocore_module_s *cryptocore_module_find(FAR char *modname, uint32_t modid);
-FAR struct cryptocore_context_s *cryptocore_context_alloc(FAR struct cryptocore_module_s *host);
+
+FAR struct cryptocore_context_s *cryptocore_context_alloc(FAR struct cryptocore_module_s *host, uint32_t flags);
+FAR struct cryptocore_context_s *cryptocore_context_find(int ctxid);
+int cryptocore_context_destroy(FAR struct cryptocore_context_s *ctx);
 
 #endif // __CRYPTO_CRYPTOCORE_H
 

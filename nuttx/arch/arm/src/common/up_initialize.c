@@ -50,6 +50,10 @@
 #include "up_arch.h"
 #include "up_internal.h"
 
+#if defined(CONFIG_CRYPTO)
+#include "nuttx/crypto/cryptomod.h"
+#endif
+
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/
@@ -237,10 +241,12 @@ void up_initialize(void)
 #if defined(CONFIG_CRYPTO)
   up_cryptoinitialize(); /* Initialize the cryptographic core */
   devcrypto_register(); /* Create /dev/crypto */
-#  if defined(CONFIG_CRYPTO_SOFTMODULE)
+
+#if defined(CONFIG_CRYPTO_SOFTMODULE)
   cryptomod_softmod_register(); /*initialize the software-only cryptographic module*/
-#  endif
-#endif
+#endif /* CONFIG_CRYPTO_SOFTMODULE */
+
+#endif /* CONFIG_CRYPTO */
 
   /* Initialize the network */
 

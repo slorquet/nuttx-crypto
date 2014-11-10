@@ -51,8 +51,6 @@
 
 #include "cryptocore.h"
 
-extern struct cryptocore_module_s *modules_head;
-
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
@@ -70,8 +68,7 @@ extern struct cryptocore_module_s *modules_head;
 int cryptomod_register(FAR char *name, FAR struct cryptomod_operations_s *ops, uint32_t flags)
 {
   FAR struct cryptocore_module_s *mod;
-  char                           locname[16];
-  int                            namelen;
+  int namelen;
 
   /* truncate the name if too long */
 
@@ -81,43 +78,28 @@ int cryptomod_register(FAR char *name, FAR struct cryptomod_operations_s *ops, u
       namelen = 16;
     }
 
-  /* copy the name to local buffer, then pad */
-
-  memcpy(locname, name, namelen);
-  for (; namelen < 16; namelen++)
-    {
-      locname[namelen]=0;
-    }
-
   /* check that no module with that name already exists */
 
-  for (mod = modules_head; mod != NULL; mod = mod->next)
+  mod = cryptocore_module_find(name, 0);
+  if (mod != NULL)
     {
-      if (memcmp(mod->name, name, 16))
-        {
-          cryptlldbg("ERROR: module '%s' already exists\n",name);
-          return -EEXIST;
-        }
+      cryptlldbg("ERROR: module '%s' already exists\n",name);
+       return -EEXIST;
     }
 
-  /* allocate the module */
+  /* allocate and link the module */
 
-  mod = (FAR struct cryptocore_module_s*)kmm_zalloc(sizeof(struct cryptocore_module_s));
+  mod = cryptocore_module_alloc();
+
   if (!mod)
     {
       cryptlldbg("ERROR: Failed to allocate module '%s'\n",name);
       return -ENOMEM;
     }
 
-  /* link */
-
-  mod->next    = modules_head;
-  modules_head = mod;
-
   /* Populate the driver entries */
 
-  memcpy(mod->name, locname, 16);
-  mod->contexts = 0;
+  memcpy(mod->name, name, namelen);
   mod->ops      = ops;
   mod->flags    = flags;
 

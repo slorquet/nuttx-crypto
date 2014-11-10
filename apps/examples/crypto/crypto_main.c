@@ -39,6 +39,7 @@
 
 #include <nuttx/config.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <nuttx/crypto/crypto.h>
@@ -88,6 +89,16 @@ static void modules_list(void)
     }
 }
 
+static void keys_list(int modid)
+{
+  if(modid>=crypto_module_count())
+    {
+      printf("Invalid module id\n");
+      return;
+    }
+  printf("Enumerating keys of module %d\n",modid);
+}
+
 /****************************************************************************
  * crypto_main
  ****************************************************************************/
@@ -124,11 +135,14 @@ int cryptool_main(int argc, char *argv[])
     {
       /* enumerate keys in a module */
       /* need an arg: module index */
+      int id;
       if(argc!=3)
         {
           usage();
           return 1;
         }
+      id = atoi(argv[2]);
+      keys_list(id);
     }
   else
     {
