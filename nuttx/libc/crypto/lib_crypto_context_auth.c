@@ -1,5 +1,5 @@
 /****************************************************************************
- * crypto/cryptocore.h
+ * libc/crypto/crypto_context_auth.c
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
@@ -33,38 +33,43 @@
  *
  ****************************************************************************/
 
-#ifndef __CRYPTO_CRYPTOCORE_H
-#define __CRYPTO_CRYPTOCORE_H
+/****************************************************************************
+ * Included Files
+ ****************************************************************************/
 
-#include <stdint.h>
+#include <nuttx/config.h>
 
-struct cryptocore_module_s
+#include <nuttx/crypto/cryptodev.h>
+#include <nuttx/crypto/crypto.h>
+
+/****************************************************************************
+ * Pre-processor Definitions
+ ****************************************************************************/
+
+/****************************************************************************
+ * Private Data
+ ****************************************************************************/
+
+extern int g_crypto_fd;
+
+/****************************************************************************
+ * Private Functions
+ ****************************************************************************/
+
+/****************************************************************************
+ * Public Functions
+ ****************************************************************************/
+
+/****************************************************************************
+ * Name: crypto_context_auth
+ *
+ * Description:
+ *   After a context has been opened, authenticate with a module.
+ *
+ **************************************************************************/
+
+int crypto_context_auth(int contextid, int step, int indatalen, FAR uint8_t *indata, FAR int *outdatalen, FAR uint8_t *outdata)
 {
-  FAR struct cryptocore_module_s    *next;     /* link to the next module in list */
-  int                                id;       /* module_id used by communication with clients */
-  char                               name[16]; /* module name, zero padded */
-  FAR struct cryptomod_operations_s *ops;      /* device specific operations */
-  int                                contexts; /* number of opened contexts */
-  uint32_t                           flags;    /* need pin, hardware, etc */
-};
-
-struct cryptocore_context_s
-{
-  FAR struct cryptocore_context_s  *next;   /* link to the next context in list */
-  int                               id;     /* context_id used by communication with clients */
-  FAR struct cryptocore_module_s   *module; /* crypto module hosting this context */
-  uint32_t                          flags;  /* context flags */
-  int                               nkeysused;
-  int                               nkeysfree;
-};
-
-FAR struct cryptocore_module_s *cryptocore_module_alloc(void);
-FAR struct cryptocore_module_s *cryptocore_module_find(FAR char *modname, int modid);
-int cryptocore_module_count(void);
-
-FAR struct cryptocore_context_s *cryptocore_context_alloc(FAR struct cryptocore_module_s *host, uint32_t flags);
-FAR struct cryptocore_context_s *cryptocore_context_find(int ctxid);
-int cryptocore_context_destroy(FAR struct cryptocore_context_s *ctx);
-
-#endif // __CRYPTO_CRYPTOCORE_H
+  return 0;
+}
 

@@ -72,3 +72,4 @@ int crypto_key_info(int contextid, int keyid, FAR struct crypto_key_info_s *info
 {
   return 0;
 }
+

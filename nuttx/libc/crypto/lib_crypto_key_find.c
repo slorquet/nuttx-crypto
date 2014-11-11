@@ -72,3 +72,4 @@ int crypto_key_find(int contextid, uint32_t flags, int index, FAR const char *na
 {
   return 0;
 }
+

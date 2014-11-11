@@ -42,7 +42,7 @@
 
 struct cryptomod_operations_s
 {
-  int (*authenticate)(FAR char *pin, int pinlen, uint32_t flags);
+  int (*authenticate)(int step, int indatalen, FAR uint8_t *indata, FAR int *outdatalen, FAR uint8_t *outdata);
   /*keys management*/
   int (*key_count)(FAR int *used, FAR int *avail);
   /*algs management*/

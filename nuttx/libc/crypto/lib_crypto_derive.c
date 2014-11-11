@@ -72,3 +72,4 @@ int crypto_derive(int contextid, int mechid, int origkeyid, int derivdatalen, FA
 {
   return 0;
 }
+

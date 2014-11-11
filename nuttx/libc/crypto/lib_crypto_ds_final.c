@@ -72,3 +72,4 @@ int crypto_ds_final(int contextid, FAR int *siglen, FAR uint8_t *sig)
 {
   return 0;
 }
+

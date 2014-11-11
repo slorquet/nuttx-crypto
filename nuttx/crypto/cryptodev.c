@@ -117,8 +117,8 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
           FAR struct cryptodev_module_info_s *info = (FAR struct cryptodev_module_info_s*)arg;
           FAR struct cryptocore_module_s     *mod;
 
-          cryptlldbg("Requesting module info (%d)\n", info->module_index);
-          mod = cryptocore_module_find(NULL, info->module_index);
+          cryptlldbg("Requesting module info (%d)\n", info->moduleid);
+          mod = cryptocore_module_find(NULL, info->moduleid);
           if (mod == NULL)
             {
               return -ENODEV;
@@ -126,7 +126,7 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
 
           memcpy(info->name, mod->name, 16);
           info->flags      = mod->flags;
-          mod->ops->key_count(&info->nkeys_used, &info->nkeys_free);
+          mod->ops->key_count(&info->nkeysused, &info->nkeysfree);
           info->nalgs      = 1;
           return 0;
         }
@@ -136,20 +136,12 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
           FAR struct cryptodev_context_open_s *info = (FAR struct cryptodev_context_open_s*)arg;
           FAR struct cryptocore_module_s      *mod;
           FAR struct cryptocore_context_s     *ctx;
-          int ret;
 
-          cryptlldbg("Opening a context with module (%d)\n", info->module_index);
-          mod = cryptocore_module_find(NULL, info->module_index);
+          cryptlldbg("Opening a context with module (%d)\n", info->moduleid);
+          mod = cryptocore_module_find(NULL, info->moduleid);
           if (mod == NULL)
             {
               return -ENODEV;
-            }
-
-          ret = mod->ops->authenticate(info->pin, info->pinlen, info->flags);
-          if (ret!=0)
-            {
-              cryptlldbg("Authentication failed");
-              return ret;
             }
 
           ctx = cryptocore_context_alloc(mod, info->flags);
@@ -160,9 +152,29 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
             }
           else
             {
-            info->context_id = ctx->id;
+            info->contextid = ctx->id;
             return 0;
             }
+        }
+
+      case CIOCRYPTO_CONTEXT_AUTH:
+        {
+          FAR struct cryptodev_context_auth_s *info = (FAR struct cryptodev_context_auth_s*)arg;
+          FAR struct cryptocore_context_s     *ctx;
+          int ret;
+          ctx = cryptocore_context_find( (int)arg );
+          if( ctx == NULL)
+            {
+              cryptlldbg("Context not found");
+              return -EBADF;
+            }
+
+          ret = ctx->module->ops->authenticate(info->step, info->indatalen, info->indata, info->outdatalen, info->outdata);
+          if (ret!=0)
+            {
+              cryptlldbg("Authentication failed");
+            }
+        return ret;
         }
 
       case CIOCRYPTO_CONTEXT_CLOSE:
@@ -171,7 +183,7 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
           ctx = cryptocore_context_find( (int)arg );
           if( ctx == NULL)
             {
-              return -ENOENT;
+              return -EBADF;
             }
           return cryptocore_context_destroy(ctx);
         }
@@ -180,7 +192,7 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
         {
           FAR struct cryptodev_context_info_s *info = (FAR struct cryptodev_context_info_s*)arg;
           FAR struct cryptocore_context_s *ctx;
-          ctx = cryptocore_context_find( info->context_id );
+          ctx = cryptocore_context_find( info->contextid );
           if( ctx == NULL)
             {
               return -ENOENT;
@@ -188,10 +200,10 @@ static int cryptodev_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
 
           /* copy the info */
 
-          info->module_id  = ctx->module->id;
+          info->moduleid  = ctx->module->id;
           info->flags      = ctx->flags;
-          info->nkeys_used = ctx->nkeys_used;
-          info->nkeys_free = ctx->nkeys_free;
+          info->nkeysused = ctx->nkeysused;
+          info->nkeysfree = ctx->nkeysfree;
 
           return 0;
         }

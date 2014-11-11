@@ -72,3 +72,4 @@ int crypto_context_info(int contextid, FAR struct crypto_context_info_s *sess)
 {
   return 0;
 }
+

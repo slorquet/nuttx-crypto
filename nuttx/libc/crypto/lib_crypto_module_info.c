@@ -73,15 +73,19 @@ int crypto_module_info(int moduleid, FAR struct crypto_module_info_s *info)
 {
   struct cryptodev_module_info_s devinfo;
   int err;
-  devinfo.module_index = moduleid;
+
+  devinfo.moduleid = moduleid;
+
   err = ioctl(g_crypto_fd, CIOCRYPTO_MODULE_INFO, (unsigned long)&devinfo);
-  if(!err)
-  {
-    //Okay, copy info
-    memcpy(info->name, devinfo.name, 16);
-    info->flags      = devinfo.flags;
-    info->nkeys_used = devinfo.nkeys_used;
-    info->nkeys_free = devinfo.nkeys_free;
-  }
+
+  if (!err)
+    {
+      //Okay, copy info
+      memcpy(info->name, devinfo.name, 16);
+      info->flags     = devinfo.flags;
+      info->nkeysused = devinfo.nkeysused;
+      info->nkeysfree = devinfo.nkeysfree;
+    }
   return err;
 }
+

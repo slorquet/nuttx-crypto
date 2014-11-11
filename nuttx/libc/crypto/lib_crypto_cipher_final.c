@@ -72,3 +72,4 @@ int crypto_cipher_final(int contextid, int inlen, FAR uint8_t *in, FAR int *outl
 {
   return 0;
 }
+

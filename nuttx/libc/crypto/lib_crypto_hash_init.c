@@ -72,3 +72,4 @@ int crypto_hash_init(int contextid, int mechid)
 {
   return 0;
 }
+

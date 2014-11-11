@@ -72,3 +72,4 @@ int crypto_ds_update(int contextid, int len, FAR uint8_t *data)
 {
   return 0;
 }
+

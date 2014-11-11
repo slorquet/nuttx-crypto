@@ -72,3 +72,4 @@ int crypto_alg_info(int token, int mech, FAR struct crypto_alg_info_s *info)
 {
   return 0;
 }
+

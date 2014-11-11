@@ -48,11 +48,14 @@
  * Pre-Processor Definitions
  ****************************************************************************/
 
-#define CRYPTO_MODULE_FLAG_NEEDPIN   0x00000001
-#define CRYPTO_MODULE_FLAG_ISHW      0x00000002
+#define CRYPTO_MODULE_FLAG_ISHW      0x00000001
+#define CRYPTO_MODULE_FLAG_NEEDPIN   0x00000002
+#define CRYPTO_MODULE_FLAG_NEEDMAUTH 0x00000004
 
 #define CRYPTO_CONTEXT_FLAG_READONLY 0x00000001
 #define CRYPTO_CONTEXT_FLAG_ADMIN    0x00000002
+
+#define CRYPTO_CONTEXT_AUTH_STEP_PIN 0
 
 #define CRYPTO_ALG_PARAM_IV          0x00000001
 #define CRYPTO_ALG_PARAM_CRC_POLY    0x00000002
@@ -90,30 +93,30 @@ struct crypto_module_info_s
 {
     char     name[16];
     uint32_t flags;
-    uint32_t nkeys_used;
-    uint32_t nkeys_free;
+    uint32_t nkeysused;
+    uint32_t nkeysfree;
     uint32_t nmechs;
 };
 
 struct crypto_context_info_s
 {
-    uint32_t module_id;
+    uint32_t moduleid;
     uint32_t flags;
-    uint32_t nkeys_used;
-    uint32_t nkeys_free;
+    uint32_t nkeysused;
+    uint32_t nkeysfree;
 };
 
 struct crypto_alg_info_s
 {
-    uint32_t alg_id;
-    uint32_t required_params;
+    uint32_t algid;
+    uint32_t requiredparams;
 };
 
 struct crypto_key_info_s
 {
     char     name[16];
     uint32_t flags;
-    uint32_t key_length;
+    uint32_t keylength;
 };
 
 /************************************************************************************
@@ -140,12 +143,13 @@ int crypto_close(void);
 int crypto_module_count(void);
 int crypto_module_info(int tokenid, FAR struct crypto_module_info_s *info);
 
-int crypto_context_open(int tokenid, uint32_t flags, FAR const char *pin);
+int crypto_context_open(int moduleid, uint32_t flags);
+int crypto_context_auth(int contextid, int step, int indatalen, FAR uint8_t *indata, FAR int *outdatalen, FAR uint8_t *outdata);
 int crypto_context_close(int contextid);
 int crypto_context_info(int contextid, FAR struct crypto_context_info_s *sess);
 
 int crypto_alg_info(int token, int mech, FAR struct crypto_alg_info_s *info);
-const char *crypto_alg_name(int mechid);
+FAR const char *crypto_alg_name(int algid);
 int crypto_alg_setparam(int contextid, uint32_t param, int len, FAR uint8_t *value);
 
 int crypto_key_find(int contextid, uint32_t flags, int index, FAR const char *label);
@@ -155,22 +159,22 @@ int crypto_key_delete(int contextid, int keyid);
 int crypto_key_setvalue(int contextid, int keyid, int component, int length, FAR uint8_t *value);
 int crypto_key_transfer(int contextid, int keyid, FAR const char *label);
 
-int crypto_cipher_init(int contextid, int keyid, uint32_t flags);
+int crypto_cipher_init(int contextid, int algid, int keyid, uint32_t flags);
 int crypto_cipher_update(int contextid, int len, FAR uint8_t *in, FAR uint8_t *out);
 int crypto_cipher_final(int contextid, int inlen, FAR uint8_t *in, FAR int *outlen, FAR uint8_t *out);
 
-int crypto_ds_init(int contextid, int mechid, int keyid, uint32_t flags);
+int crypto_ds_init(int contextid, int algid, int keyid, uint32_t flags);
 int crypto_ds_update(int contextid, int len, FAR uint8_t *data);
 int crypto_ds_final(int contextid, FAR int *siglen, FAR uint8_t *sig);
 
-int crypto_hash_init(int contextid, int mechid);
+int crypto_hash_init(int contextid, int algid);
 int crypto_hash_update(int contextid, int len, FAR uint8_t *data);
 int crypto_hash_final(int contextid, FAR int *hashlen, FAR uint8_t *hash);
 
-int crypto_derive(int contextid, int mechid, int origkeyid, int derivdatalen, FAR uint8_t *derivdata, uint32_t newkeyflags);
+int crypto_derive(int contextid, int algid, int origkeyid, int derivdatalen, FAR uint8_t *derivdata, uint32_t newkeyflags);
 
-int crypto_wrap(int contextid, int mechid, int keyid, int wrapkeyid, FAR int *wrappedlen, FAR uint8_t *wrapped);
-int crypto_unwrap(int contextid, int mechid, int wrappedlen, FAR uint8_t *wrappeddata, int wrapkeyid, uint32_t newkeyflags);
+int crypto_wrap(int contextid, int algid, int keyid, int wrapkeyid, FAR int *wrappedlen, FAR uint8_t *wrapped);
+int crypto_unwrap(int contextid, int algid, int wrappedlen, FAR uint8_t *wrappeddata, int wrapkeyid, uint32_t newkeyflags);
 
 int crypto_random_generate(int contextid, int len, FAR uint8_t *data);
 

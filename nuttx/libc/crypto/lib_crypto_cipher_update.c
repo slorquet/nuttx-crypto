@@ -72,3 +72,4 @@ int crypto_cipher_update(int contextid, int len, FAR uint8_t *in, FAR uint8_t *o
 {
   return 0;
 }
+

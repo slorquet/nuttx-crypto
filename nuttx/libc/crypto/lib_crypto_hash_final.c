@@ -72,3 +72,4 @@ int crypto_hash_final(int contextid, FAR int *hashlen, FAR uint8_t *hash)
 {
   return 0;
 }
+

@@ -55,20 +55,24 @@ int softmod_key_count(FAR int *used, FAR int *avail)
   return 0;
 }
 
-int softmod_authenticate(FAR char *pin, int pinlen, uint32_t flags)
+int softmod_context_auth(int step, int indatalen, FAR uint8_t *indata, FAR int *outdatalen, FAR uint8_t *outdata)
 {
+  if (step != CRYPTO_CONTEXT_AUTH_STEP_PIN)
+    {
+      return -EINVAL;
+    }  
+
   /*UNBELIEVABLY INSECURE PIN CHECK*/
-  if(pinlen!=4) return -EACCES;
-  if(strcmp(pin,"1234")) return -EACCES;
+  if (indatalen!=4) return -EACCES;
+  if (strcmp((FAR char*)indata, "1234")) return -EACCES;
+
   g_authenticated = TRUE;
   return 0;
 }
 
-//Private data
-
 static struct cryptomod_operations_s g_softcryptomodops =
 {
-  softmod_authenticate,
+  softmod_context_auth,
   /*keys management*/
   softmod_key_count,
   /*algs management*/

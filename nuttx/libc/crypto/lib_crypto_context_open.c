@@ -39,6 +39,8 @@
 
 #include <nuttx/config.h>
 
+#include <sys/ioctl.h>
+
 #include <nuttx/crypto/cryptodev.h>
 #include <nuttx/crypto/crypto.h>
 
@@ -64,11 +66,25 @@ extern int g_crypto_fd;
  * Name: crypto_context_open
  *
  * Description:
- *   todo
+ *   Open a context with a crypto module. Authentication is done later.
  *
  **************************************************************************/
 
-int crypto_context_open(int tokenid, uint32_t flags, FAR const char *pin)
+int crypto_context_open(int moduleid, uint32_t flags)
 {
-  return 0;
+  struct cryptodev_context_open_s info;
+  int err;
+
+  info.moduleid = moduleid;
+  info.flags    = flags;
+
+  err = ioctl(g_crypto_fd, CIOCRYPTO_CONTEXT_OPEN, (unsigned long)&info);
+
+  if (!err)
+    {
+      return info.contextid;
+    }
+
+  return err;
 }
+

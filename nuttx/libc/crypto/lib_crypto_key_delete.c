@@ -72,3 +72,4 @@ int crypto_key_delete(int contextid, int keyid)
 {
   return 0;
 }
+
