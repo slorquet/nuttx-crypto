@@ -1,5 +1,5 @@
 /*******************************************************************************
- * arch/arm/src/efm32/efm32_otgfshost.c
+ * arch/arm/src/efm32/efm32_usbhost.c
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Authors: Gregory Nutt <gnutt@nuttx.org>
@@ -809,7 +809,7 @@ static void efm32_chan_configure(FAR struct efm32_usbhost_s *priv, int chidx)
 
   /* Make sure host channel interrupts are enabled. */
 
-  efm32_modifyreg(EFM32_USB_GINTMSK, 0, USB_GINTMSK_HCHINTMSK);
+  efm32_modifyreg(EFM32_USB_GINTMSK, 0, USB_GINTMSK_PTXFEMPMSKHCHINTMSK);
 
   /* Program the HCCHAR register */
 
@@ -1663,7 +1663,7 @@ static int efm32_out_transfer(FAR struct efm32_usbhost_s *priv, int chidx,
            * data in the FIFO when the NAK occurs?  Does it discard it?
            */
 
-          efm32_flush_txfifos(USB_GRSTCTL_TXFNUM_HALL);
+          efm32_flush_txfifos(USB_GRSTCTL_TXFNUM_FALL);
 
           /* Get the device a little time to catch up.  Then retry the transfer
            * using the same buffer pointer and length.
@@ -2329,7 +2329,7 @@ static inline void efm32_gint_rxflvlisr(FAR struct efm32_usbhost_s *priv)
   /* Disable the RxFIFO non-empty interrupt */
 
   intmsk  = efm32_getreg(EFM32_USB_GINTMSK);
-  intmsk &= ~USB_GINTMSK_RXFLVLMSK;
+  intmsk &= ~USB_GINTMSK_PTXFEMPMSKRXFLVLMSK;
   efm32_putreg(EFM32_USB_GINTMSK, intmsk);
 
   /* Read and pop the next status from the Rx FIFO */
@@ -2402,7 +2402,7 @@ static inline void efm32_gint_rxflvlisr(FAR struct efm32_usbhost_s *priv)
 
   /* Re-enable the RxFIFO non-empty interrupt */
 
-  intmsk |= USB_GINTMSK_RXFLVLMSK;
+  intmsk |= USB_GINTMSK_PTXFEMPMSKRXFLVLMSK;
   efm32_putreg(EFM32_USB_GINTMSK, intmsk);
 }
 
@@ -2446,7 +2446,7 @@ static inline void efm32_gint_nptxfeisr(FAR struct efm32_usbhost_s *priv)
     {
       /* Disable further Tx FIFO empty interrupts and bail. */
 
-      efm32_modifyreg(EFM32_USB_GINTMSK, USB_GINTMSK_NPTXFE, 0);
+      efm32_modifyreg(EFM32_USB_GINTMSK, USB_GINTMSK_PTXFEMPMSKNPTXFEMPMSK, 0);
       return;
     }
 
@@ -2484,7 +2484,7 @@ static inline void efm32_gint_nptxfeisr(FAR struct efm32_usbhost_s *priv)
 
   else
     {
-      efm32_modifyreg(EFM32_USB_GINTMSK, USB_GINTMSK_NPTXFE, 0);
+      efm32_modifyreg(EFM32_USB_GINTMSK, USB_GINTMSK_PTXFEMPMSKNPTXFEMPMSK, 0);
     }
 
   /* Write the next group of packets into the Tx FIFO */
@@ -2535,7 +2535,7 @@ static inline void efm32_gint_ptxfeisr(FAR struct efm32_usbhost_s *priv)
     {
       /* Disable further Tx FIFO empty interrupts and bail. */
 
-      efm32_modifyreg(EFM32_USB_GINTMSK, USB_GINTMSK_PTXFE, 0);
+      efm32_modifyreg(EFM32_USB_GINTMSK, USB_GINTMSK_PTXFEMPMSKPTXFEMPMSK, 0);
       return;
     }
 
@@ -2573,7 +2573,7 @@ static inline void efm32_gint_ptxfeisr(FAR struct efm32_usbhost_s *priv)
 
   else
     {
-      efm32_modifyreg(EFM32_USB_GINTMSK, USB_GINTMSK_PTXFE, 0);
+      efm32_modifyreg(EFM32_USB_GINTMSK, USB_GINTMSK_PTXFEMPMSKPTXFEMPMSK, 0);
     }
 
   /* Write the next group of packets into the Tx FIFO */
@@ -2782,7 +2782,7 @@ static inline void efm32_gint_discisr(FAR struct efm32_usbhost_s *priv)
 
   /* Clear the dicsonnect interrupt */
 
-  efm32_putreg(EFM32_USB_GINTSTS, USB_GINTSTS_DISC);
+  efm32_putreg(EFM32_USB_GINTSTS, USB_GINTSTS_DISCONNINT);
 }
 
 /*******************************************************************************
@@ -2807,7 +2807,7 @@ static inline void efm32_gint_ipxfrisr(FAR struct efm32_usbhost_s *priv)
 
   /* Clear the incomplete isochronous OUT interrupt */
 
-  efm32_putreg(EFM32_USB_GINTSTS, USB_GINTSTS_IPXFR);
+  efm32_putreg(EFM32_USB_GINTSTS, USB_GINTSTS_INCOMPLP);
 }
 
 /*******************************************************************************
@@ -2877,7 +2877,7 @@ static int efm32_gint_isr(int irq, FAR void *context)
 
       /* Handle the non-periodic TxFIFO empty interrupt */
 
-      if ((pending & USB_GINTSTS_NPTXFE) != 0)
+      if ((pending & USB_GINTSTS_NPTXFEMP) != 0)
         {
           usbhost_vtrace1(OTGFS_VTRACE1_GINT_NPTXFE, 0);
           efm32_gint_nptxfeisr(priv);
@@ -2885,7 +2885,7 @@ static int efm32_gint_isr(int irq, FAR void *context)
 
       /* Handle the periodic TxFIFO empty interrupt */
 
-      if ((pending & USB_GINTSTS_PTXFE) != 0)
+      if ((pending & USB_GINTSTS_PTXFEMP) != 0)
         {
           usbhost_vtrace1(OTGFS_VTRACE1_GINT_PTXFE, 0);
           efm32_gint_ptxfeisr(priv);
@@ -2893,7 +2893,7 @@ static int efm32_gint_isr(int irq, FAR void *context)
 
       /* Handle the host channels interrupt */
 
-      if ((pending & USB_GINTSTS_HC) != 0)
+      if ((pending & USB_GINTSTS_HCHINT) != 0)
         {
           usbhost_vtrace1(OTGFS_VTRACE1_GINT_HC, 0);
           efm32_gint_hcisr(priv);
@@ -2901,14 +2901,14 @@ static int efm32_gint_isr(int irq, FAR void *context)
 
       /* Handle the host port interrupt */
 
-      if ((pending & USB_GINTSTS_HPRT) != 0)
+      if ((pending & USB_GINTSTS_PRTINT) != 0)
         {
           efm32_gint_hprtisr(priv);
         }
 
       /* Handle the disconnect detected interrupt */
 
-      if ((pending & USB_GINTSTS_DISC) != 0)
+      if ((pending & USB_GINTSTS_DISCONNINT) != 0)
         {
           usbhost_vtrace1(OTGFS_VTRACE1_GINT_DISC, 0);
           efm32_gint_discisr(priv);
@@ -2916,7 +2916,7 @@ static int efm32_gint_isr(int irq, FAR void *context)
 
       /* Handle the incomplete periodic transfer */
 
-      if ((pending & USB_GINTSTS_IPXFR) != 0)
+      if ((pending & USB_GINTSTS_INCOMPLP) != 0)
         {
           usbhost_vtrace1(OTGFS_VTRACE1_GINT_IPXFR, 0);
           efm32_gint_ipxfrisr(priv);
@@ -3076,12 +3076,12 @@ static void efm32_txfe_enable(FAR struct efm32_usbhost_s *priv, int chidx)
     default:
     case OTGFS_EPTYPE_CTRL: /* Non periodic transfer */
     case OTGFS_EPTYPE_BULK:
-      regval |= USB_GINTMSK_NPTXFE;
+      regval |= USB_GINTMSK_NPTXFEMPMSK;
       break;
 
     case OTGFS_EPTYPE_INTR: /* Periodic transfer */
     case OTGFS_EPTYPE_ISOC:
-      regval |= USB_GINTMSK_PTXFE;
+      regval |= USB_GINTMSK_PTXFEMPMSK;
       break;
     }
 
@@ -4156,18 +4156,18 @@ static void efm32_host_initialize(FAR struct efm32_usbhost_s *priv)
   efm32_putreg(EFM32_USB_HNPTXFSIZ, regval);
   offset += CONFIG_EFM32_OTGFS_NPTXFIFO_SIZE;
 
-  /* Set up the host periodic Tx fifo size register (HPTXFSIZ) */
+  /* Set up the host periodic Tx FIFO size register (HPTXFSIZ) */
 
   regval = (offset | (CONFIG_EFM32_OTGFS_PTXFIFO_SIZE << _OTGFS_HPTXFSIZ_PTXFD_SHIFT));
   efm32_putreg(EFM32_USB_HPTXFSIZ, regval);
 
-  /* If OTG were supported, we sould need to clear HNP enable bit in the
+  /* If OTG were supported, we would need to clear HNP enable bit in the
    * USB_OTG control register about here.
    */
 
   /* Flush all FIFOs */
 
-  efm32_flush_txfifos(USB_GRSTCTL_TXFNUM_HALL);
+  efm32_flush_txfifos(USB_GRSTCTL_TXFNUM_FALL);
   efm32_flush_rxfifo();
 
   /* Clear all pending HC Interrupts */
@@ -4299,11 +4299,11 @@ static inline int efm32_hw_initialize(FAR struct efm32_usbhost_s *priv)
 
   /* Then perform the core soft reset. */
 
-  efm32_putreg(EFM32_USB_GRSTCTL, USB_GRSTCTL_CSRST);
+  efm32_putreg(EFM32_USB_GRSTCTL, USB_GRSTCTL_CSFTRST);
   for (timeout = 0; timeout < EFM32_READY_DELAY; timeout++)
     {
       regval = efm32_getreg(EFM32_USB_GRSTCTL);
-      if ((regval & USB_GRSTCTL_CSRST) == 0)
+      if ((regval & USB_GRSTCTL_CSFTRST) == 0)
         {
           break;
         }
@@ -4332,8 +4332,8 @@ static inline int efm32_hw_initialize(FAR struct efm32_usbhost_s *priv)
   /* Force Host Mode */
 
   regval  = efm32_getreg(EFM32_USB_GUSBCFG);
-  regval &= ~USB_GUSBCFG_FDMOD;
-  regval |= USB_GUSBCFG_FHMOD;
+  regval &= ~_USB_GUSBCFG_FORCEDEVMODE_MASK;
+  regval |= USB_GUSBCFG_FORCEHSTMODE;
   efm32_putreg(EFM32_USB_GUSBCFG, regval);
   up_mdelay(50);
 
