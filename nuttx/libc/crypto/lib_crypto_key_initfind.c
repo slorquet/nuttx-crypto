@@ -1,5 +1,5 @@
 /****************************************************************************
- * libc/crypto/lib_crypto_module_count.c
+ * libc/crypto/lib_crypto_key_initfind.c
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author:  Sebastien Lorquet <sebastien@lorquet.fr>
@@ -39,7 +39,6 @@
 
 #include <nuttx/config.h>
 
-#include <sys/ioctl.h>
 #include <nuttx/crypto/cryptodev.h>
 #include <nuttx/crypto/crypto.h>
 
@@ -62,24 +61,15 @@ extern int g_crypto_fd;
  ****************************************************************************/
 
 /****************************************************************************
- * Name: crypto_module_count
+ * Name: crypto_key_initfind
  *
  * Description:
- *   todo
+ *   Initialize an enumerator to list keys available in a context
  *
  **************************************************************************/
 
-int crypto_module_count(void)
+int crypto_key_find(int contextid, uint32_t flags, int index, FAR const char *name)
 {
-  int modcount;
-  int ret = ioctl(g_crypto_fd, CIOCRYPTO_MODULE_COUNT, (unsigned long)&modcount);
-  if(!ret)
-  {
-    return modcount;
-  }
-  else
-  {
-    return -1;
-  }
+  return 0;
 }
 
