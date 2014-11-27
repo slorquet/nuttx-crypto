@@ -140,13 +140,13 @@ int crypto_init(void);
 int crypto_init_fd(int fd);
 int crypto_close(void);
 
-int crypto_module_count(void);
-int crypto_module_info(int tokenid, FAR struct crypto_module_info_s *info);
+int crypto_module_initfind(void **enum);
+int crypto_module_find(int contextid, void **enum, struct crypto_module_info_s *info);
 
 int crypto_context_open(int moduleid, uint32_t flags);
 int crypto_context_auth(int contextid, int step, int indatalen, FAR uint8_t *indata, FAR int *outdatalen, FAR uint8_t *outdata);
 int crypto_context_close(int contextid);
-int crypto_context_info(int contextid, FAR struct crypto_context_info_s *sess);
+int crypto_context_info(int contextid, FAR struct crypto_context_info_s *ctxt);
 
 int crypto_alg_info(int token, int mech, FAR struct crypto_alg_info_s *info);
 FAR const char *crypto_alg_name(int algid);

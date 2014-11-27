@@ -71,6 +71,7 @@
 #define _WLIOCBASE      (0x1200) /* Wireless modules ioctl commands */
 #define _CFGDIOCBASE    (0x1300) /* Config Data device (app config) ioctl commands */
 #define _TCIOCBASE      (0x1400) /* Timer ioctl commands */
+#define _CRYPTOIOCBASE  (0x1500) /* Cryptographic commands */
 
 /* Macros used to manage ioctl commands */
 

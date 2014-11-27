@@ -47,241 +47,67 @@
  * Pre-Processor Definitions
  ****************************************************************************/
 
-enum {
-	CIOCRYPTO_MODULE_COUNT = 201,
-	CIOCRYPTO_MODULE_INFO,
-	CIOCRYPTO_CONTEXT_OPEN,
-	CIOCRYPTO_CONTEXT_AUTH,
-	CIOCRYPTO_CONTEXT_CLOSE,
-	CIOCRYPTO_CONTEXT_INFO,
-	CIOCRYPTO_ALG_INFO,
-	CIOCRYPTO_ALG_SETPARAM,
-	CIOCRYPTO_KEY_FIND,
-	CIOCRYPTO_KEY_INFO,
-	CIOCRYPTO_KEY_CREATE,
-	CIOCRYPTO_KEY_DELETE,
-	CIOCRYPTO_KEY_SETVALUE,
-	CIOCRYPTO_KEY_TRANSFER,
-	CIOCRYPTO_CIPHER_INIT,
-	CIOCRYPTO_CIPHER_UPDATE,
-	CIOCRYPTO_CIPHER_FINAL,
-	CIOCRYPTO_DS_INIT,
-	CIOCRYPTO_DS_UPDATE,
-	CIOCRYPTO_DS_FINAL,
-	CIOCRYPTO_HASH_INIT,
-	CIOCRYPTO_HASH_UPDATE,
-	CIOCRYPTO_HASH_FINAL,
-	CIOCRYPTO_DERIVE,
-	CIOCRYPTO_WRAP,
-	CIOCRYPTO_UNWRAP,
-	CIOCRYPTO_GEN_RANDOM,
+#include <nuttx/fs/ioctl.h>
+
+#define _CRIOC(nr)       _IOC(_CRYPTOIOCBASE,nr)
+
+#define CRYPTOIOC_MODULE_INITFIND _CRIOC(0x0001) /* void** */
+#define CRYPTOIOC_MODULE_FIND     _CRIOC(0x0002) /* struct cryptodev_module_info_s */
+#define CRYPTOIOC_CONTEXT_OPEN    _CRIOC(0x0003) /* struct cryptodev_context_open_s */
+#define CRYPTOIOC_CONTEXT_AUTH    _CRIOC(0x0004) /* struct cryptodev_context_auth_s */
+#define CRYPTOIOC_CONTEXT_CLOSE   _CRIOC(0x0005) /* int */
+#define CRYPTOIOC_CONTEXT_INFO    _CRIOC(0x0006) /* struct cryptodev_context_info_s */
+#define CRYPTOIOC_ALG_INFO        _CRIOC(0x0007) /* struct cryptodev_alg_info_s */
+#define CRYPTOIOC_ALG_SETPARAM    _CRIOC(0x0008) /* struct cryptodev_alg_param_s */
+#define CRYPTOIOC_KEY_INITFIND    _CRIOC(0x0009) /* void** */
+#define CRYPTOIOC_KEY_FIND        _CRIOC(0x000A) /* struct cryptodev_key_find_s */
+#define CRYPTOIOC_KEY_INFO        _CRIOC(0x000B) /* struct cryptodev_key_info_s */
+#define CRYPTOIOC_KEY_CREATE      _CRIOC(0x000C) /* struct cryptodev_key_create_s */
+#define CRYPTOIOC_KEY_DELETE      _CRIOC(0x000D) /* struct cryptodev_key_delete_s */
+#define CRYPTOIOC_KEY_SETVALUE    _CRIOC(0x000E) /* struct cryptodev_key_setvalue_s */
+#define CRYPTOIOC_KEY_TRANSFER    _CRIOC(0x000F) /* struct cryptodev_key_transfer_s */
+#define CRYPTOIOC_CIPHER_INIT     _CRIOC(0x0010) /* struct cryptodev_cipher_init_s */
+#define CRYPTOIOC_CIPHER_UPDATE   _CRIOC(0x0011) /* struct cryptodev_cipher_update_s */
+#define CRYPTOIOC_CIPHER_FINAL    _CRIOC(0x0012) /* struct cryptodev_cipher_final_s */
+#define CRYPTOIOC_DS_INIT         _CRIOC(0x0013) /* struct cryptodev_ds_init_s */
+#define CRYPTOIOC_DS_UPDATE       _CRIOC(0x0014) /* struct cryptodev_data_update_s */
+#define CRYPTOIOC_DS_FINAL        _CRIOC(0x0015) /* struct cryptodev_data_final_s */
+#define CRYPTOIOC_HASH_INIT       _CRIOC(0x0016) /* struct cryptodev_hash_init_s */
+#define CRYPTOIOC_HASH_UPDATE     _CRIOC(0x0017) /* struct cryptodev_data_update_s */
+#define CRYPTOIOC_HASH_FINAL      _CRIOC(0x0018) /* struct cryptodev_data_final_s */
+#define CRYPTOIOC_DERIVE          _CRIOC(0x0019) /* struct cryptodev_derive_s */
+#define CRYPTOIOC_WRAP            _CRIOC(0x001A) /* struct cryptodev_wrap_s */
+#define CRYPTOIOC_UNWRAP          _CRIOC(0x001B) /* struct cryptodev_unwrap_s */
+#define CRYPTOIOC_GEN_RANDOM      _CRIOC(0x001C) /* struct cryptodev_derive_s */
+
+struct cryptodev_module_info_s
+{
+  void     **enumerator; /* IO: Enumerator */
+  int      moduleid;     /*  O: Module identifier */
+  char     name[16];     /*  O: Module name */
+  uint32_t flags;        /*  O: Module attributes */
+  int      nkeysused;    /*  O: Number of keys defined */
+  int      nkeysfree;    /*  O: Number of keys available */
+  int      nalgs;        /*  O: Number of available algorithms */
 };
 
-struct cryptodev_module_info_s {
-    /* Request section */
-    int      moduleid;
-    /* Response section */
-    char     name[16];
-    uint32_t flags;
-    int      nkeysused;
-    int      nkeysfree;
-    int      nalgs;
+struct cryptodev_context_open_s
+{
+  int      moduleid;  /* I : Identifier of module to access */
+  uint32_t flags;     /* I : Access options */
+  int      contextid; /*  O: Returned context identifier */
 };
 
-struct cryptodev_context_open_s {
-    /* Request section */
-    int      moduleid;
-    uint32_t flags;
-    /* Response section */
-    int      contextid;
+struct cryptodev_context_auth_s
+{
+  int      contextid;   /* I : Identifier of context to authenticate */
+  int      step;        /* I : Authentication step being executed */
+  int      indatalen;   /* I : Length of authentication data */
+  uint8_t  *indata;     /* I : Authentication data */
+  int      *outdatalen; /* IO: Length Dynamic authentication response */
+  uint8_t  *outdata;    /*  O: Dynamic authentication response */
 };
 
-struct cryptodev_context_auth_s {
-    // Request section */
-    int      contextid;
-    int      step;
-    uint8_t* indata;
-    int      indatalen;
-    /* Response section */
-    uint8_t* outdata;
-    int*     outdatalen;
-};
-
-struct cryptodev_context_info_s {
-    // Request section */
-    int      contextid;
-    /* Response section */
-    int      moduleid;
-    uint32_t flags;
-    int      nkeysused;
-    int      nkeysfree;
-};
-
-struct cryptodev_alg_info_s {
-    // Request section */
-    int      moduleid;
-    int      algindex;
-    /* Response section */
-    uint32_t algid;
-    uint32_t reqparams;
-};
-
-struct cryptodev_alg_param_s {
-    /* Request section */
-    uint32_t paramid;
-    int      paramvaluesize;
-    uint8_t* paramvalue;
-};
-
-struct cryptodev_key_find_s {
-    /* Request section */
-    int      contextid;
-    uint32_t flags;
-    char     name[16];
-    int      index;
-    /* Response section */
-    int      keyid;
-};
-
-struct cryptodev_key_info_s {
-    /* Request section */
-    int      contextid;
-    int      keyid;
-    /* Response section */
-    char     label[16];
-    uint32_t flags;
-    int      keylength;
-};
-
-struct cryptodev_key_create_s {
-    /* Request section */
-    int      contextid;
-    uint32_t flags;      //same as key info flags */
-    char     label[16];
-    /* Response section */
-    int      keyid;
-};
-
-struct cryptodev_key_delete_s {
-    /* Request section */
-    int contextid;
-    int keyid;
-};
-
-struct cryptodev_key_setvalue_s {
-    /* Request section */
-    int      contextid;
-    int      keyid;
-    int      componentid;
-    int      componentlength;
-    uint8_t* component;
-};
-
-struct cryptodev_key_transfer_s {
-    /* Request section */
-    int  contextid;
-    int  keyid;
-    char destkeylabel[16];
-};
-
-struct cryptodev_cipher_init_s {
-    /* Request section */
-    int      contextid;
-    int      algid;
-    int      keyid;
-    uint32_t flags;
-};
-
-struct cryptodev_cipher_update_s {
-    /* Request section */
-    int      contextid;
-    int      datalength; /* same for input and output */
-    uint8_t* indata;
-    /* Response section */
-    uint8_t* outdata;
-};
-
-struct cryptodev_cipher_final_s {
-    /* Request section */
-    int      contextid;
-    int      indatalength;
-    uint8_t* indata;
-    /* Mixed section */
-    int*     outdatalength;
-    /* Response section */
-    uint8_t* outdata;
-};
-
-struct cryptodev_ds_init_s {
-    /* Request section */
-    int      contextid;
-    int      algid;
-    int      keyid;
-    uint32_t flags;
-};
-
-struct cryptodev_data_update_s {
-    /* Request section */
-    int      contextid;
-    int      datalength;
-    uint8_t* data;
-};
-
-struct cryptodev_data_final_s {
-    /* Request section */
-    int      contextid;
-    //Mixed section
-    int*     siglength;
-    uint8_t* signature;
-};
-
-struct cryptodev_hash_init_s {
-    /* Request section */
-    int    contextid;
-    int    algid;
-};
-
-struct cryptodev_derive_s {
-    /* Request section */
-    int      contextid;
-    int      algmid;
-    int      originalkeyid;
-    int      derivdatalen;
-    uint8_t* derivdata;
-    uint32_t newkeyflags;
-    /* Response section */
-    int      newkeyid;
-};
-
-struct cryptodev_wrap_s {
-    /* Request section */
-    int      contextid;
-    int      algid;
-    int      keyid;
-    int      wrapkeyid;
-    /* Response section */
-    int*     wrappedlength;
-    uint8_t* wrapped;
-};
-
-struct cryptodev_unwrap_s {
-    /* Request section */
-    int      contextid;
-    int      algid;
-    int*     wrappedlength;
-    uint8_t* wrapped;
-    int      wrapkeyid;
-    uint32_t newkeyflags;
-    /* Response section */
-    int      newkeyid;
-};
-
-struct cryptodev_random_s {
-    /* Request section */
-    int     datalength;
-    /* Response section */
-    uint8_t* randomdata;
-};
 
 
 #endif /* __INCLUDE_NUTTX_CRYPTO_CRYPTODEV_H */
