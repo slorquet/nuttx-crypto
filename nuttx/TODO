@@ -1,4 +1,4 @@
-NuttX TODO List (Last updated October 11, 2014)
+NuttX TODO List (Last updated November 23, 2014)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This file summarizes known NuttX bugs, limitations, inconsistencies with
@@ -730,38 +730,6 @@ o Binary loaders (binfmt/)
 o Network (net/, drivers/net)
   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  Title:       MULTIPLE NETWORK INTERFACE SUPPORT
-  Description: uIP polling issues / Multiple network interface support:
-
-               (1) Current logic will not support multiple Ethernet drivers.
-                  Each driver should poll on TCP connections connect on the
-                  network supported by the driver; UDP polling should respond
-                  with TX data only if the UDP packet is intended for the
-                  the network supported by the driver.
-
-               (2) If there were multiple drivers, polling would occur at
-                  double the rate.  Fix by using bound IP address in TCP
-                  connection (lipaddr) and verifying that it is in the subnet
-                  served by the driver.
-
-               Another issue:  When sending packets to another subnet, the
-               current logic falls back and uses ETH0 if it cannot find the
-               device for the subnet.  That lookup would need to be smarter...
-               perhaps it needs a routing table.
-
-  Status:      Open.  Nothing will probably be done until I have a platform
-               with two network interfaces that I need to support.
-  Priority:    Medium, The feature is not important, but it is important
-               for NuttX to resolve the architectural issues.
-
-  Title:       SENDTO() AND MULTIPLE NETWORK INTERFACE SUPPORT
-  Description: sendto() and multiple network interface support:
-               When polled, would have to assure that the destination IP
-               is on the subnet served by the polling driver.
-  Status:      Open.  This is really part of the above issue.
-  Priority:    Medium, The feature is not important, but it is important
-               for NuttX to resolve the architectural issues.
-
   Title:       IPv6
   Description: IPv6 support is incomplete.  Adam Dunkels has recently announced
                IPv6 support for uIP (currently only as part of Contiki).  Those
@@ -860,6 +828,33 @@ o Network (net/, drivers/net)
   Status:      Open
   Priority:    Medium.  Important on slow applications that will not accept
                connections promptly.
+
+  Title:       INTERRUPT LEVEL PROCESSING IN ETHERNET DRIVERS
+  Description: Too many Ethernet drivers do interrupt-level processing with
+               the network stack.  The network stack supports either interrupt
+               level processing or normal task level processing (depending on
+               CONFIG_NET_NOINTS).  This is really a very bad use of CPU
+               resources;  All of the network stack processing should be more
+               to a work queue (and, all use of CONFIG_NET_NOINTS=n should
+               be eliminated).
+  Status:      Open
+  Priority:    Pretty high if you want a well behaved system.
+
+  Title:       UDP MULTICAST RECEPTION
+  Description: The logic in udp_input() expects either a single receive socket or
+               none at all.  However, multiple sockets should be capable of
+               receiving a UDP datagram (multicast reception).  This could be
+               handled easily by something like:
+
+                for (conn = NULL; conn = udp_active (pbuf, conn); )
+
+               If the callback logic that receives a packet responds with an
+               outgoing packet, then it will over-write the received buffer,
+               however.  recvfrom() will not do that, however.  We would have
+               to make that the rule: Recipients of a UDP packet must treat
+               the packet as read-only.
+  Status:      Open
+  Priority:    Low, unless your logic depends on that behavior.
 
 o USB (drivers/usbdev, drivers/usbhost)
   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

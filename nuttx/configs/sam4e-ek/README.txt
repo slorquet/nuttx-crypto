@@ -419,8 +419,8 @@ Networking Support
   Networking Support
     CONFIG_NET=y                        : Enable Neworking
     CONFIG_NET_SOCKOPTS=y               : Enable socket operations
-    CONFIG_NET_BUFSIZE=562              : Maximum packet size (MTD) 1518 is more standard
-    CONFIG_NET_RECEIVE_WINDOW=536       : Should be the same as CONFIG_NET_BUFSIZE
+    CONFIG_NET_ETH_MTU=562              : Maximum packet size (MTU) 1518 is more standard
+    CONFIG_NET_ETH_TCP_RECVWNDO=536     : Should be the same as CONFIG_NET_ETH_MTU
     CONFIG_NET_TCP=y                    : Enable TCP/IP networking
     CONFIG_NET_TCPBACKLOG=y             : Support TCP/IP backlog
     CONFIG_NET_TCP_READAHEAD_BUFSIZE=536  Read-ahead buffer size
@@ -1350,7 +1350,9 @@ Configurations
 
        This delay will be especially long if the board is not connected to
        a network because additional time will be required to fail with
-       timeout errors.  This delay can be eliminated, however, if you enable an NSH initialization option as described above in a paragraph entitled, "Network Initialization Thread."
+       timeout errors.  This delay can be eliminated, however, if you enable
+       an NSH initialization option as described above in a paragraph
+       entitled, "Network Initialization Thread."
 
        STATUS:
        2014-3-13: The basic NSH serial console is working.  Network support

@@ -30,6 +30,13 @@ STATUS
     Starter Kit.
   2014-11-12:  The basic NSH configuration is functional with a serial console
     on LEUART0.
+  2014-11-14:  LEUART0 BAUD increased from 2400 to 9600.  Calibrated delay
+    loop.
+  2014-11-18:  Added basic drivers for USB device and host.  The initial port
+    is a simple leverage from the STM32 which appears to use the same IP.
+    The current state is just the STM32 USB drivers with the appropriate.
+    The USB drivers still lack EFM32 initialization logic and are, of course,
+    completely untested.
 
 LEDs and Buttons
 ================
@@ -99,10 +106,8 @@ Serial Console
 
    Default Serial Console
    ----------------------
-   LEUART0 is configured as the default serial console at 2400 8N1
-   on pins PD5 and PD4.  It certainly be possible to go to 4800 baud
-   and the documentation claims that 9600 baud is possible (although
-   I am not sure how).
+   LEUART0 is configured as the default serial console at 9600 8N1
+   on pins PD5 and PD4.
 
      ---------- ---- ----------- -----------
      SIGNAL     PGIO EXP Header  Test Point
@@ -192,9 +197,7 @@ Configurations
   nsh:
   ---
     Configures the NuttShell (nsh) located at apps/examples/nsh.  The
-    Configuration enables the serial interfaces on LEUART0.  Support for
-    built-in applications is enabled, but in the base configuration no
-    built-in applications are selected (see NOTES below).
+    Configuration enables the serial interfaces on LEUART0 at 9600 8N1.
 
     NOTES:
 
