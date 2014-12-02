@@ -4,10 +4,10 @@
 #
 
 config CRYPTO
-  bool "Crypto API support"
-  default n
-  ---help---
-    Enable or disable Crypto API features
+	bool "Crypto API support"
+	default n
+	---help---
+		Enable or disable Crypto API features
 
 if CRYPTO
 
