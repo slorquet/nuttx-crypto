@@ -41,6 +41,7 @@
 #include "trv_main.h"
 #include "trv_mem.h"
 #include "trv_color.h"
+#include "trv_raycntl.h"
 #include "trv_debug.h"
 #include "trv_graphics.h"
 
@@ -85,7 +86,7 @@ static FAR struct fb_vtable_s *trv_get_fbdev(void)
   ret = up_fbinitialize();
   if (ret < 0)
     {
-      trv_abort("up_fbinitialize failed: %d\n", -ret);
+      trv_abort("ERROR: up_fbinitialize failed: %d\n", -ret);
     }
 
   /* Set up to use video plane 0.  There is no support for anything but
@@ -95,7 +96,7 @@ static FAR struct fb_vtable_s *trv_get_fbdev(void)
   fbdev = up_fbgetvplane(0);
   if (!fbdev)
     {
-      trv_abort("up_fbgetvplane(0) failed\n");
+      trv_abort("ERROR: up_fbgetvplane(0) failed\n");
     }
 
   return fbdev;
@@ -127,16 +128,16 @@ static void trv_fb_initialize(FAR struct trv_graphics_info_s *ginfo)
   ret = fbdev->getvideoinfo(fbdev, &vinfo);
   if (ret < 0)
     {
-      trv_abort("getvideoinfo() failed\n");
+      trv_abort("ERROR: getvideoinfo() failed\n");
     }
 
-  ginfo->hwwidth  = vinfo.xres;
-  ginfo->hwheight = vinfo.yres;
+  ginfo->xres = vinfo.xres;
+  ginfo->yres = vinfo.yres;
 
   ret = fbdev->getplaneinfo(fbdev, 0, &pinfo);
   if (ret < 0)
     {
-      trv_abort("getplaneinfo() failed\n");
+      trv_abort("ERROR: getplaneinfo() failed\n");
     }
 
   ginfo->stride   = pinfo.stride;
@@ -144,7 +145,7 @@ static void trv_fb_initialize(FAR struct trv_graphics_info_s *ginfo)
 
   if (vinfo.fmt != TRV_COLOR_FMT || pinfo.bpp != TRV_BPP)
     {
-      trv_abort("Bad color format(%d)/bpp(%b)\n", vinfo.fmt, pinfo.bpp);
+      trv_abort("ERROR: Bad color format(%d)/bpp(%d)\n", vinfo.fmt, pinfo.bpp);
     }
 }
 #endif
@@ -329,24 +330,21 @@ void trv_row_update(struct trv_graphics_info_s *ginfo,
                     FAR const trv_pixel_t *src,
                     FAR dev_pixel_t *dest)
 {
-  trv_coord_t hexpand;
   dev_pixel_t pixel;
   trv_coord_t srccol;
   int i;
 
   /* Loop for each column in the src render buffer */
 
-  hexpand = (1 << ginfo->hscale);
-
-  for (srccol = 0; srccol < ginfo->swwidth; srccol++)
+  for (srccol = 0; srccol < TRV_SCREEN_WIDTH; srccol++)
     {
       /* Map the source pixel */
 
       pixel = ginfo->palette.lut[*src++];
 
-      /* Copy it to the destination, expanding as necessary */
+      /* Expand pixels horizontally via pixel replication */
 
-      for (i = 0; i < hexpand; i++)
+      for (i = 0; i < ginfo->xscale; i++)
         {
           *dest++ = pixel;
         }
@@ -354,7 +352,7 @@ void trv_row_update(struct trv_graphics_info_s *ginfo,
 }
 
 /****************************************************************************
- * Name: trv_row_tranfer
+ * Name: trv_row_transfer
  *
  * Description:
  *   Transfer one line from the line buffer to the NX window.
@@ -383,8 +381,8 @@ void trv_display_update(struct trv_graphics_info_s *ginfo,
 
 int trv_graphics_initialize(FAR struct trv_graphics_info_s *ginfo)
 {
-  int swwidth;
-  int swheight;
+  int width;
+  int height;
   int scale;
 
   /* Initialize the graphics device and get information about the display */
@@ -397,31 +395,39 @@ int trv_graphics_initialize(FAR struct trv_graphics_info_s *ginfo)
   trv_nxsu_initialize(ginfo);
 #endif
 
+  /* Check the size of the display */
+
+  width  = ginfo->xres;
+  height = ginfo->yres;
+
+  if (width < TRV_SCREEN_WIDTH || height < TRV_SCREEN_HEIGHT)
+    {
+      trv_abort("ERROR: Display is too small\n");
+    }
+
   /* Check if we need to scale the image */
 
-  swwidth = ginfo->hwwidth;
-  scale   = 0;
+  scale = 0;
 
-  while (swwidth > MAX_REND_WIDTH)
+  while (width >= TRV_SCREEN_WIDTH)
     {
-      swwidth >>= 1;
+      width -= TRV_SCREEN_WIDTH;
       scale++;
     }
 
-  ginfo->swwidth = swwidth;
-  ginfo->hscale   = scale;
+  ginfo->xscale   = scale;
+  ginfo->xoffset  = (width >> 1);
+  ginfo->imgwidth = scale * TRV_SCREEN_WIDTH * sizeof(dev_pixel_t);
 
-  swheight = ginfo->hwheight;
-  scale    = 0;
-
-  while (swheight > MAX_REND_WIDTH)
+  scale = 0;
+  while (height >= TRV_SCREEN_HEIGHT)
     {
-      swheight >>= 1;
+      height -= TRV_SCREEN_HEIGHT;
       scale++;
     }
 
-  ginfo->swheight = swheight;
-  ginfo->vscale   = scale;
+  ginfo->yscale  = scale;
+  ginfo->yoffset = (height >> 1);
 
   /* Allocate buffers
    *
@@ -431,7 +437,7 @@ int trv_graphics_initialize(FAR struct trv_graphics_info_s *ginfo)
    */
 
    ginfo->swbuffer = (trv_pixel_t*)
-     trv_malloc(swwidth * swheight * sizeof(trv_pixel_t));
+     trv_malloc(TRV_SCREEN_WIDTH * TRV_SCREEN_HEIGHT * sizeof(trv_pixel_t));
    if (!ginfo->swbuffer)
      {
        trv_abort("ERROR: Failed to allocate render buffer\n");
@@ -448,8 +454,7 @@ int trv_graphics_initialize(FAR struct trv_graphics_info_s *ginfo)
    */
 
 #ifdef CONFIG_NX
-   ginfo->hwbuffer = (trv_pixel_t*)
-     trv_malloc(ginfo->hwwidth * sizeof(dev_pixel_t));
+   ginfo->hwbuffer = (trv_pixel_t*)trv_malloc(ginfo->imgwidth);
    if (!ginfo->hwbuffer)
      {
        trv_abort("ERROR: Failed to allocate hardware line buffer\n");
@@ -503,28 +508,33 @@ void trv_graphics_terminate(FAR struct trv_graphics_info_s *ginfo)
 
 void trv_display_update(struct trv_graphics_info_s *ginfo)
 {
-  FAR const uint8_t *src = (FAR const uint8_t *)ginfo->swbuffer;
-  FAR uint8_t *dest = (FAR uint8_t *)ginfo->hwbuffer;
+  FAR const uint8_t *src;
+  FAR uint8_t *dest;
   trv_coord_t srcrow;
 #ifdef CONFIG_NX
   trv_coord_t destrow;
 #else
   FAR uint8_t *first;
-  trv_coord_t lnwidth;
 #endif
-  trv_coord_t vexpand;
   int i;
 
-  /* Loop for each row in the srce render buffer */
+  /* Get the star tof the first source row */
 
-  vexpand = (1 << ginfo->vscale);
+  src = (FAR const uint8_t *)ginfo->swbuffer;
+
+  /* Get the start of the first destination row */
+
+  dest = (FAR uint8_t *)ginfo->hwbuffer +
+         (ginfo->yoffset * ginfo->stride) +
+         (ginfo->xoffset * sizeof(dev_pixel_t));
+
+  /* Loop for each row in the src render buffer */
+
 #ifdef CONFIG_NX
   destrow = 0;
-#else
-  lnwidth = ginfo->hwwidth * sizeof(dev_pixel_t);
 #endif
 
-  for (srcrow = 0; srcrow < ginfo->swheight; srcrow++)
+  for (srcrow = 0; srcrow < TRV_SCREEN_HEIGHT; srcrow++)
     {
       /* Transfer the row to the device row/buffer */
 
@@ -534,7 +544,7 @@ void trv_display_update(struct trv_graphics_info_s *ginfo)
 #ifdef CONFIG_NX
       /* Transfer the row buffer to the NX window */
 
-      trv_row_tranfer(ginfo, dest, destrow);
+      trv_row_transfer(ginfo, dest, destrow);
       destrow++;
 #else
       first = dest;
@@ -543,24 +553,24 @@ void trv_display_update(struct trv_graphics_info_s *ginfo)
 
       /* Then replicate as many times as is necessary */
 
-      for (i = 1; i < vexpand; i++)
+      for (i = 1; i < ginfo->yscale; i++)
         {
 #ifdef CONFIG_NX
           /* Transfer the row buffer to the NX window */
 
-          trv_row_tranfer(ginfo, dest, destrow);
+          trv_row_transfer(ginfo, dest, destrow);
           destrow++;
 #else
           /* Point to the next row in the frame buffer */
 
-          memcpy(dest, first, lnwidth);
+          memcpy(dest, first, ginfo->imgwidth);
           dest += ginfo->stride;
 #endif
         }
 
       /* Point to the next src row */
 
-      src += ginfo->swwidth;
+      src += TRV_SCREEN_WIDTH;
     }
 }
 

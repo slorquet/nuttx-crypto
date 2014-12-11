@@ -1,5 +1,6 @@
 /****************************************************************************
  * apps/graphics/traveler/include/trv_world.h
+ * This file contains definitions for the world model
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author: Gregory Nutt <gnutt@nuttx.org>
@@ -84,7 +85,7 @@ extern trv_coord_t g_run_stepheight;
  * Public Function Prototypes
  ****************************************************************************/
 
-int  trv_world_create(FAR const char *mapfile);
+int  trv_world_create(FAR const char *wldpath, FAR const char *wldfile);
 void trv_world_destroy(void);
 
 #endif /* __APPS_GRAPHICS_TRAVELER_INCLUDE_TRV_WORLD_H */

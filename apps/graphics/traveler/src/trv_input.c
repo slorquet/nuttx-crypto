@@ -1,6 +1,5 @@
 /****************************************************************************
  * apps/graphics/traveler/trv_input.c
- * This file contains the main logic for the NuttX version of Traveler
  *
  *   Copyright (C) 2014 Gregory Nutt. All rights reserved.
  *   Author: Gregory Nutt <gnutt@nuttx.org>
@@ -119,7 +118,7 @@ static struct trv_input_info_s g_trv_input_info;
 #ifdef CONFIG_GRAPHICS_TRAVELER_AJOYSTICK
 static void trv_joystick_calibrate(void)
 {
-#warning Missing logic"
+#warning Missing logic
 }
 #endif
 

@@ -94,7 +94,6 @@ static inline int binfmt_copyargv(FAR struct binary_s *bin, FAR char * const *ar
 
   bin->argv      = (FAR char **)NULL;
   bin->argbuffer = (FAR char *)NULL;
-  i = 0;
 
   if (argv)
     {
@@ -120,7 +119,7 @@ static inline int binfmt_copyargv(FAR struct binary_s *bin, FAR char * const *ar
             }
         }
 
-      bvdbg("args=%d argsize=%lu\n", i, (unsigned long)argsize);
+      bvdbg("args=%d argsize=%lu\n", nargs, (unsigned long)argsize);
 
       /* Allocate the argv array and an argument buffer */
 
