@@ -62,14 +62,6 @@ static const char * g_unimplemented = "Unimplemented";
  * Public Functions
  ****************************************************************************/
 
-/****************************************************************************
- * Name: crypto_alg_name
- *
- * Description:
- *   todo
- *
- **************************************************************************/
-
 const char *crypto_alg_name(int mechid)
 {
   return g_unimplemented;

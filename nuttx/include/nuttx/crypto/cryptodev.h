@@ -44,7 +44,7 @@
 #include <stdint.h>
 
 /****************************************************************************
- * Pre-Processor Definitions
+ * Pre-processor Definitions
  ****************************************************************************/
 
 #include <nuttx/fs/ioctl.h>

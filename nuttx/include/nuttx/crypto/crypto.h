@@ -45,7 +45,7 @@
 #include <nuttx/config.h>
 
 /****************************************************************************
- * Pre-Processor Definitions
+ * Pre-processor Definitions
  ****************************************************************************/
 
 #define CRYPTO_MODULE_FLAG_ISHW      0x00000001
